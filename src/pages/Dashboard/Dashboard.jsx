@@ -1,9 +1,22 @@
-import React from 'react'
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  return (
-    <div>Dashboard</div>
-  )
-}
+  const navigate = useNavigate();
 
-export default Dashboard
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  return (
+    <div>
+      Dashboard
+      <button onClick={() => navigate("/task")}>Task</button>
+    </div>
+  );
+};
+
+export default Dashboard;
