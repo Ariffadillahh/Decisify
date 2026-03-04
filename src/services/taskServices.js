@@ -1,5 +1,4 @@
-import { gooeyToast } from "goey-toast";
-import { dbPromise } from "./db";
+import { db } from "./db";
 
 const calculateFinalScore = (taskData) => {
   const { date_deadline, tingkat_kesulitan, estimasi_jam } = taskData;
@@ -17,8 +16,8 @@ const calculateFinalScore = (taskData) => {
 };
 
 export const getAllTasks = async () => {
-  const db = await dbPromise;
-  const allTasks = await db.getAll("tasks");
+  const allTasks = await db.tasks.toArray();
+
   const now = new Date().getTime();
   const ONE_MINUTE = 60 * 1000;
 
@@ -34,29 +33,24 @@ export const getAllTasks = async () => {
 };
 
 export const archiveOldTasks = async () => {
-  const db = await dbPromise;
-  const allTasks = await db.getAll("tasks");
+  const allTasks = await db.tasks.toArray();
+
   const now = new Date().getTime();
   const ONE_MINUTE = 60 * 1000;
 
   for (const task of allTasks) {
-    if (
-      task.done &&
-      task.completedAt &&
-      now - task.completedAt >= ONE_MINUTE &&
-      !task.archived
-    ) {
+    // Jika sudah lewat 1 menit dan belum ditandai archived
+    if (task.done && task.completedAt && now - task.completedAt >= ONE_MINUTE && !task.archived) {
       const archivedTask = { ...task, archived: true };
-      await db.put("tasks", archivedTask);
-      gooeyToast.success("Changes saved", {
-        description: `Task "${task.title}" archived.`,
-      });
+
+      await db.tasks.put(archivedTask);
+
+      console.log(`Task "${task.title}" diarsipkan (tetap ada di DB)`);
     }
   }
 };
 
 export const createTask = async (taskData) => {
-  const db = await dbPromise;
   const finalScore = calculateFinalScore(taskData);
   const newTask = {
     ...taskData,
@@ -64,20 +58,19 @@ export const createTask = async (taskData) => {
     done: false,
     userId: JSON.parse(localStorage.getItem("user"))?.id || null,
   };
-  const id = await db.add("tasks", newTask);
+  const id = await db.tasks.add(newTask);
   return { ...newTask, id };
 };
 
 export const updateTask = async (id, data) => {
-  const db = await dbPromise;
   const newScore = calculateFinalScore(data);
   const updatedTask = { ...data, id, finalScore: newScore };
-  await db.put("tasks", updatedTask);
+  await db.tasks.put(updatedTask);
   return updatedTask;
 };
 
 export const deleteTask = async (id) => {
-  const db = await dbPromise;
-  await db.delete("tasks", id);
+  await db.tasks.delete(id);
+
   return { success: true };
 };

@@ -1,14 +1,12 @@
-import { dbPromise } from "./db";
+import { db } from "./db";
 
 export const createUser = async (name) => {
-  const db = await dbPromise;
-
   const userObject = {
     username: name,
     createdAt: new Date().toISOString(),
   };
 
-  const id = await db.add("users", userObject);
+  const id = await db.users.add(userObject);
 
   return { ...userObject, id };
 };
