@@ -8,6 +8,6 @@ export const db = new Dexie(DB_NAME);
 db.version(DB_VERSION).stores({
   users: "++id",
   tasks: "++id, userId",
-  notes: "++id",
-  study_sessions: "++id",
+  notes: "++id, userId",
+  focus_sessions: "++id",
 });

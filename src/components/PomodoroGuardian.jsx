@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaPlay,
@@ -9,153 +9,47 @@ import {
   FaStepForward,
   FaCompactDisc,
 } from "react-icons/fa";
-import { MdTimer, MdFullscreen, MdFullscreenExit } from "react-icons/md";
-
-// 1. Import Images
-import sakuraImg from "../assets/sakura.jpg";
-import tokyoImg from "../assets/tokyo.jpg";
-
-// 2. Import SFX (Musik)
-import nightChill from "../assets/sfx/night-chill.mp3";
-import winterCity from "../assets/sfx/winter-city.mp3";
-import winterWalk from "../assets/sfx/winter-walk.mp3";
-
-// Daftar Tema
-const THEME_LIST = [
-  { id: "tokyo", name: "Tokyo Night", bg: `url(${tokyoImg})` },
-  { id: "sakura", name: "Spring Sakura", bg: `url(${sakuraImg})` },
-  { id: "dark", name: "Deep Space", bg: "none", colorClass: "bg-slate-950" },
-];
-
-// Daftar Playlist Musik
-const PLAYLIST = [
-  { title: "Night Chill", src: nightChill },
-  { title: "Winter City", src: winterCity },
-  { title: "Winter Walk", src: winterWalk },
-];
+import {
+  MdTimer,
+  MdFullscreen,
+  MdFullscreenExit,
+  MdOutlineClose,
+} from "react-icons/md";
+import { usePomodoro, THEME_LIST, PLAYLIST } from "../hooks/usePomodoro";
 
 const PomodoroGuardian = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isFocusMode, setIsFocusMode] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isRest, setIsRest] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
-
-  // State Fullscreen
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Timer State
-  const [focusDuration, setFocusDuration] = useState(23);
-  const [breakDuration, setBreakDuration] = useState(5);
-  const [timeLeft, setTimeLeft] = useState(focusDuration * 60);
-  const [theme, setTheme] = useState(THEME_LIST[0]);
-
-  // Music Player State
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const audioRef = useRef(null);
-
-  // --- LOGIC: Lock Scroll ---
-  useEffect(() => {
-    document.body.style.overflow = isFocusMode ? "hidden" : "auto";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isFocusMode]);
-
-  // --- LOGIC: Sync Fullscreen ---
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
-
-  // --- LOGIC: Timer Otomatis ---
-  useEffect(() => {
-    let timer = null;
-    if (isFocusMode && !isPaused && !isFinished && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    } else if (timeLeft === 0 && isFocusMode && !isFinished) {
-      if (!isRest) {
-        setIsRest(true);
-        setTimeLeft(breakDuration * 60);
-      } else {
-        setIsFinished(true);
-      }
-    }
-    return () => clearInterval(timer);
-  }, [isFocusMode, isPaused, timeLeft, isFinished, isRest, breakDuration]);
-
-  // --- LOGIC: Music Player ---
-  useEffect(() => {
-    if (isMusicPlaying) {
-      audioRef.current
-        ?.play()
-        .catch((e) => console.log("Audio play error:", e));
-    } else {
-      audioRef.current?.pause();
-    }
-  }, [isMusicPlaying, currentSongIndex]);
-
-  useEffect(() => {
-    if (isFocusMode && !isPaused && !isFinished) {
-      setIsMusicPlaying(true);
-    } else {
-      setIsMusicPlaying(false);
-    }
-  }, [isFocusMode, isPaused, isFinished]);
-
-  // --- HANDLERS ---
-  const handleStop = () => {
-    setIsFocusMode(false);
-    setIsPaused(false);
-    setIsRest(false);
-    setIsFinished(false);
-    setTimeLeft(focusDuration * 60);
-    setIsMusicPlaying(false);
-
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch((err) => console.log(err));
-    }
-  };
-
-  const handleStartNewSession = () => {
-    setIsRest(false);
-    setIsFinished(false);
-    setIsPaused(false);
-    setTimeLeft(focusDuration * 60);
-    setIsMusicPlaying(true);
-  };
-
-  const nextSong = () => {
-    setCurrentSongIndex((prev) => (prev + 1) % PLAYLIST.length);
-    setIsMusicPlaying(true);
-  };
-
-  const prevSong = () => {
-    setCurrentSongIndex(
-      (prev) => (prev - 1 + PLAYLIST.length) % PLAYLIST.length,
-    );
-    setIsMusicPlaying(true);
-  };
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.log(`Error attempting to enable fullscreen: ${err.message}`);
-      });
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-  };
-
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  const {
+    isOpen,
+    setIsOpen,
+    isFocusMode,
+    setIsFocusMode,
+    isPaused,
+    setIsPaused,
+    isRest,
+    setIsRest,
+    isFinished,
+    setIsFinished,
+    isFullscreen,
+    focusDuration,
+    setFocusDuration,
+    breakDuration,
+    setBreakDuration,
+    timeLeft,
+    setTimeLeft,
+    theme,
+    setTheme,
+    currentSongIndex,
+    isMusicPlaying,
+    setIsMusicPlaying,
+    audioRef,
+    handleStop,
+    handleStartNewSession,
+    nextSong,
+    prevSong,
+    toggleFullscreen,
+    minutes,
+    seconds,
+  } = usePomodoro();
 
   const renderThemeSelectors = () => (
     <div className="flex justify-center gap-2 md:gap-3 flex-wrap">
@@ -199,6 +93,7 @@ const PomodoroGuardian = () => {
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(true)}
           className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 bg-indigo-600 rounded-full shadow-lg text-white"
+          title="Pomodoro Timer"
         >
           <MdTimer size={24} />
         </motion.button>
@@ -207,16 +102,15 @@ const PomodoroGuardian = () => {
       <AnimatePresence>
         {isFocusMode && (
           <motion.div
-            initial={{ clipPath: "circle(0% at 92% 92%)" }}
-            animate={{ clipPath: "circle(150% at 92% 92%)" }}
-            exit={{ clipPath: "circle(0% at 92% 92%)" }}
+            initial={{ clipPath: "circle(0% at 99% 99%)" }}
+            animate={{ clipPath: "circle(150% at 99% 99%)" }}
+            exit={{ clipPath: "circle(0% at 99% 99%)" }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className={`fixed inset-0 z-[100] flex flex-col items-center justify-center text-white bg-cover bg-center ${theme.colorClass || ""}`}
             style={{ backgroundImage: theme.bg !== "none" ? theme.bg : "none" }}
           >
             <div className="absolute inset-0 bg-black/50 z-[-1]"></div>
 
-            {/* Tombol Fullscreen Reponsif */}
             <button
               onClick={toggleFullscreen}
               className="absolute top-4 right-4 md:top-8 md:right-8 z-50 p-2 md:p-3 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-xl md:rounded-2xl text-white transition-all border border-white/10 shadow-lg"
@@ -231,10 +125,10 @@ const PomodoroGuardian = () => {
 
             <p className="text-sm md:text-xl uppercase tracking-[0.3em] mb-2 md:mb-4 font-light opacity-80 mt-10 md:mt-0">
               {isRest && !isFinished
-                ? "☕ Break"
+                ? "Break and Relax"
                 : !isFinished
-                  ? "🎯 Focus"
-                  : "✨ Selesai"}
+                  ? "Stay Focus"
+                  : "Finish!"}
             </p>
 
             {isFinished ? (
@@ -243,11 +137,6 @@ const PomodoroGuardian = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 className="flex flex-col items-center mt-4 w-full max-w-lg px-4"
               >
-                {/* Teks Finish Responsif */}
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10 text-center drop-shadow-lg">
-                  1 Sesi Selesai! Kerja Bagus.
-                </h2>
-
                 <div className="bg-black/30 backdrop-blur-md p-4 md:p-6 rounded-2xl md:rounded-3xl mb-6 md:mb-10 w-full border border-white/10">
                   <p className="text-center text-xs md:text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">
                     Ganti Suasana Sesi Berikutnya?
@@ -255,12 +144,12 @@ const PomodoroGuardian = () => {
                   {renderThemeSelectors()}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
+                <div className="flex flex-row gap-4">
                   <button
                     onClick={handleStop}
-                    className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 bg-white/20 hover:bg-white/30 rounded-xl md:rounded-2xl backdrop-blur-md transition-all font-bold border border-white/30"
+                    className="w-fit py-3 px-4 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md transition-all font-bold border border-white/10"
                   >
-                    Tutup & Kembali
+                    <MdOutlineClose className="text-xl md:text-2xl" />
                   </button>
                   <button
                     onClick={handleStartNewSession}
@@ -272,7 +161,6 @@ const PomodoroGuardian = () => {
               </motion.div>
             ) : (
               <>
-                {/* Angka Timer Super Responsif */}
                 <div className="flex text-[6rem] sm:text-[9rem] md:text-[12rem] font-black tabular-nums leading-none drop-shadow-2xl">
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -297,11 +185,11 @@ const PomodoroGuardian = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Tombol Play/Stop Responsif */}
                 <div className="mt-8 md:mt-12 flex gap-4 md:gap-6 items-center">
                   <button
                     onClick={() => setIsPaused(!isPaused)}
                     className="p-4 md:p-6 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md transition-all border border-white/30"
+                    title={isPaused ? "Resume Timer" : "Pause Timer"}
                   >
                     {isPaused ? (
                       <FaPlay className="text-lg md:text-2xl" />
@@ -313,6 +201,7 @@ const PomodoroGuardian = () => {
                   <button
                     onClick={handleStop}
                     className="p-4 md:p-6 bg-red-500/90 hover:bg-red-600 rounded-full shadow-xl transition-all"
+                    title="Stop and close"
                   >
                     <FaStop className="text-lg md:text-2xl" />
                   </button>
@@ -320,8 +209,7 @@ const PomodoroGuardian = () => {
               </>
             )}
 
-            {/* --- MUSIC PLAYER (Pindah ke Kiri Bawah & Responsif) --- */}
-            <div className="absolute bottom-4 left-4 md:bottom-10 md:left-10 flex items-center gap-2 md:gap-4 bg-black/40 backdrop-blur-xl p-2 pr-4 md:p-3 md:pr-5 rounded-full border border-white/10 shadow-2xl transition-all hover:bg-black/60 scale-90 sm:scale-100 origin-bottom-left">
+            <div className="absolute bottom-4 right-0 md:bottom-10 md:right-10 flex items-center gap-2 md:gap-4 bg-black/40 backdrop-blur-xl p-2 pr-4 md:p-3 md:pr-5 rounded-full border border-white/10 shadow-2xl transition-all hover:bg-black/60 scale-90 sm:scale-100 origin-bottom-left">
               <div
                 className={`w-10 h-10 md:w-14 md:h-14 rounded-full bg-slate-900 border-[3px] md:border-4 border-slate-700 flex items-center justify-center shadow-inner ${
                   isMusicPlaying ? "animate-[spin_4s_linear_infinite]" : ""
@@ -375,7 +263,6 @@ const PomodoroGuardian = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            // Settings Modal Responsif (Bisa muat di HP)
             className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-[70] w-[calc(100%-2rem)] max-w-sm md:w-80 bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-slate-100"
           >
             <h3 className="text-lg md:text-xl font-bold text-slate-800 mb-4 md:mb-6">

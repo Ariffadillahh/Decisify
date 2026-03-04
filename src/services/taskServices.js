@@ -1,3 +1,4 @@
+import { gooeyToast } from "goey-toast";
 import { db } from "./db";
 
 const calculateFinalScore = (taskData) => {
@@ -39,13 +40,19 @@ export const archiveOldTasks = async () => {
   const ONE_MINUTE = 60 * 1000;
 
   for (const task of allTasks) {
-    // Jika sudah lewat 1 menit dan belum ditandai archived
-    if (task.done && task.completedAt && now - task.completedAt >= ONE_MINUTE && !task.archived) {
+    if (
+      task.done &&
+      task.completedAt &&
+      now - task.completedAt >= ONE_MINUTE &&
+      !task.archived
+    ) {
       const archivedTask = { ...task, archived: true };
 
       await db.tasks.put(archivedTask);
 
-      console.log(`Task "${task.title}" diarsipkan (tetap ada di DB)`);
+      gooeyToast.info("Task Archived", {
+        description: `Task "${task.title}" has been archived.`,
+      });
     }
   }
 };

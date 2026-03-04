@@ -12,7 +12,7 @@ import "goey-toast/styles.css";
 const App = () => {
   return (
     <>
-      <GooeyToaster position="bottom-right" />
+      <GooeyToaster position="top-right" />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/welcome" element={<Welcome />} />
