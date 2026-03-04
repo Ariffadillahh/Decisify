@@ -1,3 +1,4 @@
+import { gooeyToast } from "goey-toast";
 import { dbPromise } from "./db";
 
 const calculateFinalScore = (taskData) => {
@@ -22,11 +23,8 @@ export const getAllTasks = async () => {
   const ONE_MINUTE = 60 * 1000;
 
   return allTasks.filter((task) => {
-    // 1. Jika tugas belum selesai, tampilkan.
     if (!task.done) return true;
 
-    // 2. Jika tugas sudah selesai, tampilkan HANYA jika belum lewat 1 menit
-    // dan belum di-archive secara permanen.
     if (task.done && task.completedAt && now - task.completedAt < ONE_MINUTE) {
       return true;
     }
@@ -42,7 +40,6 @@ export const archiveOldTasks = async () => {
   const ONE_MINUTE = 60 * 1000;
 
   for (const task of allTasks) {
-    // Jika sudah lewat 1 menit dan belum ditandai archived
     if (
       task.done &&
       task.completedAt &&
@@ -50,8 +47,10 @@ export const archiveOldTasks = async () => {
       !task.archived
     ) {
       const archivedTask = { ...task, archived: true };
-      await db.put("tasks", archivedTask); // Simpan kembali, JANGAN di-delete
-      console.log(`Task "${task.title}" diarsipkan (tetap ada di DB)`);
+      await db.put("tasks", archivedTask);
+      gooeyToast.success("Changes saved", {
+        description: `Task "${task.title}" archived.`,
+      });
     }
   }
 };
