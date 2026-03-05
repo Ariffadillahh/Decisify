@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { gooeyToast } from "goey-toast"; 
 import {
   getAllTasks,
   createTask,
@@ -22,18 +23,36 @@ export const useTasks = () => {
 
   const fetchTasks = useCallback(async () => {
     const data = await getAllTasks();
+    const now = new Date().getTime();
 
     const normalized = data.map((task) => ({
       ...task,
-      status: task.status || "Todo",
+      status: task.status || "Backlog",
       done: task.status === "Done",
     }));
 
-    const todoDoing = normalized
+    // 1. Logika Filter Backlog: H-7 atau Score > 0.7
+    const visibleTasks = normalized.filter((task) => {
+      if (task.status === "Backlog") {
+        const deadlineTime = new Date(task.date_deadline).getTime();
+        // Hitung sisa hari dari sekarang ke deadline
+        const diffDays = Math.ceil(
+          (deadlineTime - now) / (1000 * 60 * 60 * 24),
+        );
+
+        // Kembalikan true jika H-7 (atau kurang) ATAU skor urgensi > 0.7
+        return diffDays <= 7 || task.finalScore > 0.7;
+      }
+      // Untuk status Todo, Doing, Done tetap ditampilkan semua
+      return true;
+    });
+
+    // 2. Sorting otomatis (Sudah aman: b.finalScore - a.finalScore mengurutkan dari tertinggi)
+    const todoDoing = visibleTasks
       .filter((t) => t.status !== "Done")
       .sort((a, b) => b.finalScore - a.finalScore);
 
-    const done = normalized
+    const done = visibleTasks
       .filter((t) => t.status === "Done")
       .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
 
@@ -87,7 +106,7 @@ export const useTasks = () => {
       const originalTask = tasks.find((t) => t.id === currentTaskId);
       await updateTask(currentTaskId, { ...originalTask, ...payload });
     } else {
-      await createTask({ ...payload, status: "Todo", done: false });
+      await createTask({ ...payload, status: "Backlog", done: false });
     }
 
     setIsModalOpen(false);
@@ -104,6 +123,19 @@ export const useTasks = () => {
       destination.index === source.index
     ) {
       return;
+    }
+
+    // 3. Logika Maksimal 5 Task di Todo
+    // Cek jika task dipindah KE Todo (tapi BUKAN dari dalam Todo itu sendiri)
+    if (destination.droppableId === "Todo" && source.droppableId !== "Todo") {
+      const currentTodoCount = tasks.filter((t) => t.status === "Todo").length;
+
+      if (currentTodoCount >= 5) {
+        gooeyToast.error(
+          "Todo Max 5",
+        );
+        return; // Hentikan proses drag-and-drop
+      }
     }
 
     const updatedTasks = Array.from(tasks);

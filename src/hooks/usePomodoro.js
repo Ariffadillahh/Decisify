@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 
-
 import sakuraImg from "../assets/sakura.jpg";
 import tokyoImg from "../assets/tokyo.jpg";
 
@@ -29,9 +28,14 @@ export const usePomodoro = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const [focusDuration, setFocusDuration] = useState(23);
+  // Inisialisasi duration & session terlebih dahulu sebelum dipakai oleh timeLeft
+  const [focusDuration, setFocusDuration] = useState(25);
   const [breakDuration, setBreakDuration] = useState(5);
-  const [timeLeft, setTimeLeft] = useState(focusDuration * 60);
+  const [totalSessions, setTotalSessions] = useState(4);
+  const [currentSession, setCurrentSession] = useState(1);
+
+  // Sekarang aman untuk mengeset timeLeft
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [theme, setTheme] = useState(THEME_LIST[0]);
 
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
@@ -62,21 +66,43 @@ export const usePomodoro = () => {
   }, []);
 
   useEffect(() => {
-    let timer = null;
+    let interval = null;
+
     if (isFocusMode && !isPaused && !isFinished && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
     } else if (timeLeft === 0 && isFocusMode && !isFinished) {
       if (!isRest) {
-        saveSessionRecord("completed");
-
-        setIsRest(true);
-        setTimeLeft(breakDuration * 60);
+        // Waktu Fokus habis
+        if (currentSession < totalSessions) {
+          // Jika sesi belum maksimal, lanjut ke waktu Istirahat
+          setIsRest(true);
+          setTimeLeft(breakDuration * 60);
+        } else {
+          // Jika ini sesi terakhir, tampilkan layar Finish
+          setIsFinished(true);
+        }
       } else {
-        setIsFinished(true);
+        // Waktu Istirahat habis, kembali ke Fokus dan tambah 1 sesi
+        setIsRest(false);
+        setCurrentSession((prev) => prev + 1);
+        setTimeLeft(focusDuration * 60);
       }
     }
-    return () => clearInterval(timer);
-  }, [isFocusMode, isPaused, timeLeft, isFinished, isRest, breakDuration]);
+
+    return () => clearInterval(interval);
+  }, [
+    isFocusMode,
+    isPaused,
+    isFinished,
+    timeLeft,
+    isRest,
+    currentSession,
+    totalSessions,
+    focusDuration,
+    breakDuration,
+  ]);
 
   useEffect(() => {
     if (isMusicPlaying) {
@@ -105,6 +131,7 @@ export const usePomodoro = () => {
     setIsPaused(false);
     setIsRest(false);
     setIsFinished(false);
+    setCurrentSession(1); // Reset sesi ke 1 jika di-stop
     setTimeLeft(focusDuration * 60);
     setIsMusicPlaying(false);
 
@@ -117,6 +144,7 @@ export const usePomodoro = () => {
     setIsRest(false);
     setIsFinished(false);
     setIsPaused(false);
+    setCurrentSession(1); // Mulai sesi baru dari awal
     setTimeLeft(focusDuration * 60);
     setIsMusicPlaying(true);
   };
@@ -164,6 +192,10 @@ export const usePomodoro = () => {
     setFocusDuration,
     breakDuration,
     setBreakDuration,
+    totalSessions, 
+    setTotalSessions, 
+    currentSession, 
+    setCurrentSession, 
     timeLeft,
     setTimeLeft,
     theme,
