@@ -10,7 +10,6 @@ const ActiveTasksList = ({
   handleMarkTaskDone,
   isFinished,
 }) => {
-  // Fungsi Helper dipindah ke sini karena hanya dipakai di daftar ini
   const getTimeRemaining = (deadlineDate) => {
     const total = Date.parse(deadlineDate) - Date.parse(new Date());
     if (total <= 0) return "Telah Berakhir";
@@ -24,12 +23,10 @@ const ActiveTasksList = ({
     return `${minutes} Menit lagi`;
   };
 
-  // Jangan render jika sesi sudah selesai atau tidak ada tugas
   if (isFinished || activeTasks.length === 0) return null;
 
   return (
     <>
-      {/* TOMBOL TOGGLE TASK (Mobile) */}
       <div className="absolute top-20 z-50 md:hidden flex justify-center w-full">
         <button
           onClick={() => setShowTasksMobile(!showTasksMobile)}
@@ -44,7 +41,6 @@ const ActiveTasksList = ({
         </button>
       </div>
 
-      {/* KOTAK TARGET SESI DI KIRI */}
       <div
         className={`absolute left-4 md:left-10 top-36 md:top-1/2 md:-translate-y-1/2 z-40 bg-black/50 md:bg-black/40 backdrop-blur-xl p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl w-[calc(100%-2rem)] md:w-80 max-h-[50vh] md:max-h-[70vh] flex flex-col transition-all duration-500 origin-top
         ${showTasksMobile ? "opacity-100 visible scale-100" : "opacity-0 invisible scale-95 md:opacity-100 md:visible md:scale-100"}`}

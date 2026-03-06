@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MdTimer } from "react-icons/md";
 
+import { usePomodoro } from "../../hooks/usePomodoro";
 import { useTasks } from "../../hooks/useTasks";
 import { updateTask } from "../../services/taskServices";
 import { gooeyToast } from "goey-toast";
 
 import PomodoroSetupModal from "./PomodoroSetupModal";
 import PomodoroFocusScreen from "./PomodoroFocusScreen";
-import { PLAYLIST, usePomodoro } from "../../hooks/usePomodoro";
+import { PLAYLIST } from "../../helpers/pomodoroUtils";
 
 const PomodoroTimer = () => {
   const pomodoro = usePomodoro();
@@ -50,6 +51,8 @@ const PomodoroTimer = () => {
     pomodoro.setCurrentSession(1);
     pomodoro.setTimeLeft(pomodoro.focusDuration * 60);
     setShowTasksMobile(false);
+
+    window.dispatchEvent(new Event("tasks_updated"));
   };
 
   const handleStopAndRevert = async () => {
@@ -64,6 +67,8 @@ const PomodoroTimer = () => {
     setActiveTasks([]);
     setSelectedTaskIds([]);
     pomodoro.handleStop();
+
+    window.dispatchEvent(new Event("tasks_updated"));
   };
 
   const handleMarkTaskDone = async (task) => {
@@ -90,6 +95,9 @@ const PomodoroTimer = () => {
     try {
       await updateTask(task.id, updatedTaskData);
       if (isNowDone) gooeyToast.success("Tugas selesai! Kerja bagus.");
+
+      // Memicu sinkronisasi ke papan Kanban instan!
+      window.dispatchEvent(new Event("tasks_updated"));
     } catch (error) {
       console.error("Gagal mengupdate tugas:", error);
       gooeyToast.error("Gagal menyimpan status tugas.");

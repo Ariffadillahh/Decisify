@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { gooeyToast } from "goey-toast"; 
+import { gooeyToast } from "goey-toast";
 import {
   getAllTasks,
   createTask,
@@ -35,37 +35,45 @@ export const useTasks = () => {
     const visibleTasks = normalized.filter((task) => {
       if (task.status === "Backlog") {
         const deadlineTime = new Date(task.date_deadline).getTime();
-        // Hitung sisa hari dari sekarang ke deadline
         const diffDays = Math.ceil(
           (deadlineTime - now) / (1000 * 60 * 60 * 24),
         );
-
-        // Kembalikan true jika H-7 (atau kurang) ATAU skor urgensi > 0.7
         return diffDays <= 7 || task.finalScore > 0.7;
       }
-      // Untuk status Todo, Doing, Done tetap ditampilkan semua
-      return true;
+      return true; // Untuk Todo, Doing, Done diloloskan
     });
 
-    // 2. Sorting otomatis (Sudah aman: b.finalScore - a.finalScore mengurutkan dari tertinggi)
+    // 2. Pisahkan Todo & Doing, lalu urutkan berdasarkan urgensi tertinggi
     const todoDoing = visibleTasks
       .filter((t) => t.status !== "Done")
       .sort((a, b) => b.finalScore - a.finalScore);
 
-    const done = visibleTasks
+    // 3. Pisahkan Done, urutkan dari yang terbaru diselesaikan, dan BATASI MAX 5
+    const doneTasks = visibleTasks
       .filter((t) => t.status === "Done")
-      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
+      .slice(0, 5); // Tampilkan maksimal 5 saja di UI
 
-    setTasks([...todoDoing, ...done]);
+    setTasks([...todoDoing, ...doneTasks]);
   }, []);
 
   useEffect(() => {
     fetchTasks();
+
+    // Interval untuk mengecek task mana yang sudah 24 jam di kolom Done untuk di-archive
     const interval = setInterval(async () => {
       await archiveOldTasks();
       fetchTasks();
-    }, 10000);
-    return () => clearInterval(interval);
+    }, 60000); // Cek setiap 1 menit (60.000 ms)
+
+    // Listener untuk sinkronisasi UI instan antar komponen (misal dari Pomodoro)
+    const syncTasks = () => fetchTasks();
+    window.addEventListener("tasks_updated", syncTasks);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("tasks_updated", syncTasks);
+    };
   }, [fetchTasks]);
 
   const openModal = (task = null) => {
@@ -111,6 +119,7 @@ export const useTasks = () => {
 
     setIsModalOpen(false);
     fetchTasks();
+    window.dispatchEvent(new Event("tasks_updated")); // Pemicu sinkronisasi
   };
 
   const onDragEnd = async (result) => {
@@ -125,16 +134,12 @@ export const useTasks = () => {
       return;
     }
 
-    // 3. Logika Maksimal 5 Task di Todo
-    // Cek jika task dipindah KE Todo (tapi BUKAN dari dalam Todo itu sendiri)
+    // Batasi kolom Todo maksimal 5 task
     if (destination.droppableId === "Todo" && source.droppableId !== "Todo") {
       const currentTodoCount = tasks.filter((t) => t.status === "Todo").length;
-
       if (currentTodoCount >= 5) {
-        gooeyToast.error(
-          "Todo Max 5",
-        );
-        return; // Hentikan proses drag-and-drop
+        gooeyToast.error("Todo Max 5");
+        return;
       }
     }
 
@@ -145,7 +150,6 @@ export const useTasks = () => {
     if (draggedIndex === -1) return;
 
     const draggedTask = updatedTasks[draggedIndex];
-
     updatedTasks.splice(draggedIndex, 1);
 
     const isDone = destination.droppableId === "Done";
@@ -153,7 +157,7 @@ export const useTasks = () => {
       ...draggedTask,
       status: destination.droppableId,
       done: isDone,
-      completedAt: isDone ? Date.now() : null,
+      completedAt: isDone ? Date.now() : null, // Catat waktu selesai
     };
 
     if (isDone) {
@@ -167,16 +171,19 @@ export const useTasks = () => {
       updatedTasks.push(updatedTask);
     }
 
+    // Optimistic UI Update (Biarkan pengguna melihat perubahannya secepat kilat)
     const todoAndDoing = updatedTasks
       .filter((t) => t.status !== "Done")
       .sort((a, b) => b.finalScore - a.finalScore);
-
     const doneTasks = updatedTasks.filter((t) => t.status === "Done");
+    setTasks([...todoAndDoing, ...doneTasks]);
 
-    const finalTasks = [...todoAndDoing, ...doneTasks];
-
-    setTasks(finalTasks);
+    // Lakukan pembaruan di background (DB)
     await updateTask(updatedTask.id, updatedTask);
+
+    // Panggil ulang fetch untuk memberlakukan limit 5 Done dan sinkronkan dengan komponen lain
+    fetchTasks();
+    window.dispatchEvent(new Event("tasks_updated"));
   };
 
   const handleDelete = async (e, id) => {
@@ -184,6 +191,7 @@ export const useTasks = () => {
     if (window.confirm("Hapus tugas ini?")) {
       await deleteTask(id);
       fetchTasks();
+      window.dispatchEvent(new Event("tasks_updated")); 
     }
   };
 
@@ -198,5 +206,6 @@ export const useTasks = () => {
     handleSubmit,
     onDragEnd,
     handleDelete,
+    fetchTasks
   };
 };

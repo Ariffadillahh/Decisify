@@ -18,42 +18,33 @@ const calculateFinalScore = (taskData) => {
 
 export const getAllTasks = async () => {
   const allTasks = await db.tasks.toArray();
-
-  const now = new Date().getTime();
-  const ONE_MINUTE = 60 * 1000;
-
-  return allTasks.filter((task) => {
-    if (!task.done) return true;
-
-    if (task.done && task.completedAt && now - task.completedAt < ONE_MINUTE) {
-      return true;
-    }
-
-    return false;
-  });
+  return allTasks.filter((task) => !task.archived);
 };
 
 export const archiveOldTasks = async () => {
   const allTasks = await db.tasks.toArray();
-
   const now = new Date().getTime();
-  const ONE_MINUTE = 60 * 1000;
+
+  const TIME_ARCHIVED = 60 * 1000;
+
+  let archivedCount = 0;
 
   for (const task of allTasks) {
     if (
       task.done &&
       task.completedAt &&
-      now - task.completedAt >= ONE_MINUTE &&
+      now - task.completedAt >= TIME_ARCHIVED &&
       !task.archived
     ) {
       const archivedTask = { ...task, archived: true };
-
       await db.tasks.put(archivedTask);
 
-      gooeyToast.info("Task Archived", {
-        description: `Task "${task.title}" has been archived.`,
-      });
+      archivedCount++;
     }
+  }
+
+  if (archivedCount > 0) {
+    gooeyToast.info(`${archivedCount} task lama telah dipindahkan ke Archive.`);
   }
 };
 
@@ -63,6 +54,7 @@ export const createTask = async (taskData) => {
     ...taskData,
     finalScore,
     done: false,
+    archived: false,
     userId: JSON.parse(localStorage.getItem("user"))?.id || null,
   };
   const id = await db.tasks.add(newTask);

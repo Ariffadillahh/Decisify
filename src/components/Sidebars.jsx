@@ -10,7 +10,7 @@ import { LuUniversity } from "react-icons/lu";
 
 const menu = [
   { icon: MdDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: GrTasks, label: "Task Management", path: "/task" },
+  { icon: GrTasks, label: "Task Management", path: "/tasks" },
   { icon: CgNotes, label: "Notes", path: "/notes" },
   { icon: IoArchiveSharp, label: "Archive", path: "/archive" },
 ];

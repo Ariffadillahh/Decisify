@@ -11,8 +11,8 @@ import {
 } from "react-icons/fa";
 import { MdFullscreen, MdFullscreenExit, MdOutlineClose } from "react-icons/md";
 import { BsCalendarDate } from "react-icons/bs";
-import { PLAYLIST } from "../../hooks/usePomodoro";
 import ThemeSelector from "./ThemeSelector";
+import { PLAYLIST } from "../../helpers/pomodoroUtils";
 
 const PomodoroFocusScreen = ({
   pomodoro,
@@ -45,7 +45,6 @@ const PomodoroFocusScreen = ({
     setCurrentSession,
   } = pomodoro;
 
-  // Helper sisa waktu
   const getTimeRemaining = (deadlineDate) => {
     const total = Date.parse(deadlineDate) - Date.parse(new Date());
     if (total <= 0) return "Telah Berakhir";
@@ -70,14 +69,13 @@ const PomodoroFocusScreen = ({
           className={`fixed inset-0 z-[100] flex flex-col items-center justify-center text-white bg-cover bg-center ${theme.colorClass || ""}`}
           style={{ backgroundImage: theme.bg !== "none" ? theme.bg : "none" }}
         >
-          {/* OVERLAY BG */}
           <div
             className={`absolute inset-0 z-[-1] transition-all duration-1000 ${isRest ? "bg-black/85 backdrop-blur-md" : "bg-black/60"}`}
           ></div>
 
           <button
             onClick={toggleFullscreen}
-            className="absolute top-4 right-4 md:top-8 md:right-8 z-50 p-2 md:p-3 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-xl md:rounded-2xl text-white transition-all border border-white/10 shadow-lg"
+            className="absolute top-4 hidden md:flex right-4 md:top-8 md:right-8 z-50 p-2 md:p-3 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-xl md:rounded-2xl text-white transition-all border border-white/10 shadow-lg"
             title="Toggle Fullscreen"
           >
             {isFullscreen ? (
@@ -87,7 +85,6 @@ const PomodoroFocusScreen = ({
             )}
           </button>
 
-          {/* TOMBOL TOGGLE TASK (Mobile) */}
           {!isFinished && activeTasks.length > 0 && (
             <div className="absolute top-20 z-50 md:hidden flex justify-center w-full">
               <button
@@ -105,7 +102,6 @@ const PomodoroFocusScreen = ({
             </div>
           )}
 
-          {/* KOTAK TARGET SESI DI KIRI */}
           {!isFinished && activeTasks.length > 0 && (
             <div
               className={`absolute left-4 md:left-10 top-36 md:top-1/2 md:-translate-y-1/2 z-40 bg-black/50 md:bg-black/40 backdrop-blur-xl p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl w-[calc(100%-2rem)] md:w-80 max-h-[50vh] md:max-h-[70vh] flex flex-col transition-all duration-500 origin-top
@@ -193,7 +189,6 @@ const PomodoroFocusScreen = ({
             </div>
           )}
 
-          {/* AREA TIMER UTAMA (Tengah) */}
           <div className="flex flex-col items-center justify-center z-10 w-full mt-24 md:mt-0 transition-transform duration-500">
             <p
               className={`text-sm md:text-xl uppercase tracking-[0.3em] mb-2 md:mb-4 font-light text-center transition-colors duration-1000 ${isRest ? "text-emerald-300 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]" : "opacity-80"}`}
@@ -289,7 +284,6 @@ const PomodoroFocusScreen = ({
             )}
           </div>
 
-          {/* Music Player UI */}
           <div className="absolute bottom-4 right-0 md:bottom-10 md:right-10 flex items-center gap-2 md:gap-4 bg-black/50 backdrop-blur-xl p-2 pr-4 md:p-3 md:pr-5 rounded-full border border-white/10 shadow-2xl transition-all hover:bg-black/70 scale-90 sm:scale-100 origin-bottom-left z-50">
             <div
               className={`w-10 h-10 md:w-14 md:h-14 rounded-full bg-slate-900 border-[3px] md:border-4 border-slate-700 flex items-center justify-center shadow-inner relative ${isMusicPlaying ? "animate-[spin_4s_linear_infinite]" : ""}`}
