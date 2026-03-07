@@ -56,26 +56,35 @@ export const archiveOldTasks = async () => {
   const allTasks = await db.tasks.toArray();
   const now = new Date().getTime();
 
-  const TIME_ARCHIVED = 60 * 1000;
+  const TIME_24_HOURS = 24 * 60 * 60 * 1000;
+
+  const doneTasks = allTasks
+    .filter((t) => t.status === "Done" && !t.archived)
+    .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
 
   let archivedCount = 0;
 
-  for (const task of allTasks) {
+  if (doneTasks.length > 5) {
+    const extraTasks = doneTasks.slice(5); 
+    for (const task of extraTasks) {
+      await db.tasks.update(task.id, { archived: true });
+      archivedCount++;
+    }
+  }
+
+  for (const task of doneTasks.slice(0, 5)) {
     if (
-      task.done &&
       task.completedAt &&
-      now - task.completedAt >= TIME_ARCHIVED &&
+      now - task.completedAt >= TIME_24_HOURS &&
       !task.archived
     ) {
-      const archivedTask = { ...task, archived: true };
-      await db.tasks.put(archivedTask);
-
+      await db.tasks.update(task.id, { archived: true });
       archivedCount++;
     }
   }
 
   if (archivedCount > 0) {
-    gooeyToast.info(`${archivedCount} task lama telah dipindahkan ke Archive.`);
+    gooeyToast.info(`${archivedCount} tugas telah dipindahkan ke Archive.`);
   }
 };
 
@@ -108,7 +117,9 @@ export const deleteTask = async (id) => {
 export const getArchivedTasks = async () => {
   const allTasks = await db.tasks.toArray();
   const archived = allTasks.filter((task) => task.archived === true);
-  return archived.sort((a, b) => (b.completedAt || b.id) - (a.completedAt || a.id));
+  return archived.sort(
+    (a, b) => (b.completedAt || b.id) - (a.completedAt || a.id),
+  );
 };
 
 export const restoreArchivedTask = async (task) => {
@@ -123,16 +134,16 @@ export const restoreArchivedTask = async (task) => {
 };
 
 export const reopenArchivedTask = async (id, dataFromForm) => {
-  const numericId = Number(id); 
+  const numericId = Number(id);
 
   const newScore = calculateFinalScore(dataFromForm);
 
   await db.tasks.update(numericId, {
-    ...dataFromForm, 
-    finalScore: newScore, 
-    archived: false, 
-    done: false, 
-    status: "Backlog", 
+    ...dataFromForm,
+    finalScore: newScore,
+    archived: false,
+    done: false,
+    status: "Backlog",
     completedAt: undefined,
   });
 

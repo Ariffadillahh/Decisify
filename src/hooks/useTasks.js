@@ -145,6 +145,7 @@ export const useTasks = () => {
       categoryId: finalCategoryId,
       tingkat_kesulitan: parseInt(formData.tingkat_kesulitan),
       estimasi_jam: parseInt(formData.estimasi_jam),
+      completedAt: formData.status === "Done" ? Date.now() : null,
     };
 
     delete payload.category;
@@ -218,6 +219,10 @@ export const useTasks = () => {
     setTasks([...todoAndDoing, ...doneTasks]);
 
     await updateTask(updatedTask.id, updatedTask);
+
+    if (isDone) {
+      await archiveOldTasks();
+    }
 
     fetchTasks();
     window.dispatchEvent(new Event("tasks_updated"));
