@@ -1,11 +1,14 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import Sidebars from "../components/Sidebars";
+import { useTasks } from "../hooks/useTasks";
 
 const MainLayouts = ({ children }) => {
   const location = useLocation();
   const excludedPaths = ["/", "/welcome"];
   const showWidget = !excludedPaths.includes(location.pathname);
+
+  const { tasks } = useTasks();
 
   return (
     <div className="relative min-h-screen bg-[#f8fafc]">

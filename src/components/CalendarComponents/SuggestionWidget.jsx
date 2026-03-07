@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { BsStars } from "react-icons/bs";
+import { ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
 
 const SuggestionWidget = ({ suggestedTasks }) => {
   return (
@@ -33,15 +34,9 @@ const SuggestionWidget = ({ suggestedTasks }) => {
                   <p className="text-sm font-bold text-slate-200 truncate leading-tight mb-2.5">
                     {task.title}
                   </p>
-                  <div className="flex items-center gap-2">
-                    {task.finalScore > 0.7 && (
-                      <span className="text-[9px] font-black uppercase tracking-widest text-red-300 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md shrink-0">
-                        Score: {task.finalScore.toFixed(2)}
-                      </span>
-                    )}
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      📅 {task.date_deadline}
-                    </span>
+                  <div className="space-y-2">
+                    <ScoreBadge finalScore={task.finalScore} />
+                    <TimeBadge date_deadline={task.date_deadline} />
                   </div>
                 </div>
               </div>

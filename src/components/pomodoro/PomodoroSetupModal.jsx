@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MdTimer } from "react-icons/md";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import ThemeSelector from "./ThemeSelector";
+import { StatusBadge, TimeBadge } from "../TaskBadge";
 
 const PomodoroSetupModal = ({
   pomodoro,
@@ -72,7 +73,7 @@ const PomodoroSetupModal = ({
               <div className="flex flex-col min-h-0">
                 <div className="flex items-center justify-between mb-3 shrink-0">
                   <p className="text-[11px] md:text-sm font-black text-slate-400 uppercase tracking-widest">
-                    Pilih Task 
+                    Pilih Task
                   </p>
                   {availableTasks.length > 0 && (
                     <button
@@ -92,13 +93,29 @@ const PomodoroSetupModal = ({
                   )}
                 </div>
 
-                <div className="overflow-y-auto space-y-2.5 p-1 max-h-[200px] md:max-h-[300px] custom-scrollbar border border-slate-100 rounded-2xl bg-slate-50/50 flex-1">
+                <div className="overflow-y-auto space-y-2 p-1.5 max-h-[200px] md:max-h-[300px] custom-scrollbar border border-slate-100 rounded-2xl bg-slate-50/50 flex-1">
                   {availableTasks.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                      <p className="text-sm font-bold text-slate-400 mb-1">
+                    <div className="flex flex-col items-center justify-center h-full p-6 text-center opacity-70">
+                      {/* Tambahan Icon agar Empty State tidak membosankan */}
+                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm border border-slate-100">
+                        <svg
+                          className="w-6 h-6 text-slate-300"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-sm font-extrabold text-slate-500 mb-1">
                         Todo Kosong
                       </p>
-                      <p className="text-xs text-slate-400 italic">
+                      <p className="text-xs text-slate-400">
                         Kamu bisa langsung mulai timer tanpa task.
                       </p>
                     </div>
@@ -106,29 +123,48 @@ const PomodoroSetupModal = ({
                     availableTasks.map((task) => (
                       <label
                         key={task.id}
-                        className={`flex items-start gap-3 p-3.5 rounded-xl cursor-pointer transition-all border group ${
+                        className={`flex items-start gap-3 p-3.5 md:p-4 rounded-xl cursor-pointer transition-all duration-200 border group active:scale-[0.99] ${
                           selectedTaskIds.includes(task.id)
-                            ? "bg-indigo-50 border-indigo-200 shadow-sm shadow-indigo-100"
-                            : "bg-white border-white hover:bg-slate-50 hover:border-slate-100 shadow shadow-black/5 hover:shadow-black/10"
+                            ? "bg-indigo-50/80 border-indigo-200 shadow-sm shadow-indigo-100/50"
+                            : "bg-white border-transparent hover:border-slate-200 shadow-sm shadow-black/[0.03] hover:shadow-md hover:shadow-black/[0.05]"
                         }`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={selectedTaskIds.includes(task.id)}
-                          onChange={() => handleToggleTaskSelection(task.id)}
-                          className="mt-1 rounded text-indigo-600 focus:ring-indigo-500 w-4.5 h-4.5 md:w-5 md:h-5 shrink-0 cursor-pointer border-slate-200"
-                        />
-                        <div className="flex flex-col flex-1 truncate">
-                          <span className="text-xs md:text-sm font-semibold text-slate-900 leading-snug truncate group-hover:text-indigo-950">
+                        <div className="relative flex items-center justify-center mt-0.5 shrink-0">
+                          <input
+                            type="checkbox"
+                            checked={selectedTaskIds.includes(task.id)}
+                            onChange={() => handleToggleTaskSelection(task.id)}
+                            className="peer appearance-none w-5 h-5 border-2 border-slate-200 rounded-md checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all cursor-pointer"
+                          />
+                          <svg
+                            className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity duration-200"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <span
+                            className={`text-sm font-bold leading-tight truncate transition-colors ${
+                              selectedTaskIds.includes(task.id)
+                                ? "text-indigo-900"
+                                : "text-slate-700 group-hover:text-slate-900"
+                            }`}
+                          >
                             {task.title}
                           </span>
-                          <div className="flex items-center gap-2 mt-1.5 shrink-0 opacity-70">
-                            <span className="text-[9px] md:text-[10px] font-black uppercase text-indigo-400 bg-indigo-100/50 px-1.5 py-0.5 rounded shadow-inner">
-                              Sc: {task.finalScore.toFixed(4)}
-                            </span>
-                            <span className="text-[9px] md:text-[10px] text-slate-400">
-                              📅 {task.date_deadline}
-                            </span>
+
+                          <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                            <TimeBadge date_deadline={task.date_deadline} />
+                            <StatusBadge status={task.status} />
                           </div>
                         </div>
                       </label>

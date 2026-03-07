@@ -6,6 +6,7 @@ import {
   updateTask,
   deleteTask,
   archiveOldTasks,
+  calculateFinalScore,
 } from "../services/taskServices";
 
 export const useTasks = () => {
@@ -27,11 +28,11 @@ export const useTasks = () => {
 
     const normalized = data.map((task) => ({
       ...task,
+      finalScore: calculateFinalScore(task),
       status: task.status || "Backlog",
       done: task.status === "Done",
     }));
 
-    // 1. Logika Filter Backlog: H-7 atau Score > 0.7
     const visibleTasks = normalized.filter((task) => {
       if (task.status === "Backlog") {
         const deadlineTime = new Date(task.date_deadline).getTime();
@@ -40,19 +41,17 @@ export const useTasks = () => {
         );
         return diffDays <= 7 || task.finalScore > 0.7;
       }
-      return true; // Untuk Todo, Doing, Done diloloskan
+      return true; 
     });
 
-    // 2. Pisahkan Todo & Doing, lalu urutkan berdasarkan urgensi tertinggi
     const todoDoing = visibleTasks
       .filter((t) => t.status !== "Done")
       .sort((a, b) => b.finalScore - a.finalScore);
 
-    // 3. Pisahkan Done, urutkan dari yang terbaru diselesaikan, dan BATASI MAX 5
     const doneTasks = visibleTasks
       .filter((t) => t.status === "Done")
       .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
-      .slice(0, 5); // Tampilkan maksimal 5 saja di UI
+      .slice(0, 5); 
 
     setTasks([...todoDoing, ...doneTasks]);
   }, []);
@@ -60,13 +59,11 @@ export const useTasks = () => {
   useEffect(() => {
     fetchTasks();
 
-    // Interval untuk mengecek task mana yang sudah 24 jam di kolom Done untuk di-archive
     const interval = setInterval(async () => {
       await archiveOldTasks();
       fetchTasks();
-    }, 60000); // Cek setiap 1 menit (60.000 ms)
+    }, 60000); 
 
-    // Listener untuk sinkronisasi UI instan antar komponen (misal dari Pomodoro)
     const syncTasks = () => fetchTasks();
     window.addEventListener("tasks_updated", syncTasks);
 
@@ -78,11 +75,16 @@ export const useTasks = () => {
 
   const openModal = (task = null) => {
     if (task) {
+      let formattedDate = task.date_deadline;
+      if (formattedDate && formattedDate.length === 10) {
+        formattedDate += "T00:00";
+      }
+
       setIsEditMode(true);
       setCurrentTaskId(task.id);
       setFormData({
         title: task.title,
-        date_deadline: task.date_deadline,
+        date_deadline: formattedDate,
         tingkat_kesulitan: task.tingkat_kesulitan,
         estimasi_jam: task.estimasi_jam,
       });
@@ -119,7 +121,7 @@ export const useTasks = () => {
 
     setIsModalOpen(false);
     fetchTasks();
-    window.dispatchEvent(new Event("tasks_updated")); // Pemicu sinkronisasi
+    window.dispatchEvent(new Event("tasks_updated")); 
   };
 
   const onDragEnd = async (result) => {
@@ -134,7 +136,6 @@ export const useTasks = () => {
       return;
     }
 
-    // Batasi kolom Todo maksimal 5 task
     if (destination.droppableId === "Todo" && source.droppableId !== "Todo") {
       const currentTodoCount = tasks.filter((t) => t.status === "Todo").length;
       if (currentTodoCount >= 5) {
@@ -157,7 +158,7 @@ export const useTasks = () => {
       ...draggedTask,
       status: destination.droppableId,
       done: isDone,
-      completedAt: isDone ? Date.now() : null, // Catat waktu selesai
+      completedAt: isDone ? Date.now() : null,
     };
 
     if (isDone) {
@@ -171,17 +172,14 @@ export const useTasks = () => {
       updatedTasks.push(updatedTask);
     }
 
-    // Optimistic UI Update (Biarkan pengguna melihat perubahannya secepat kilat)
     const todoAndDoing = updatedTasks
       .filter((t) => t.status !== "Done")
       .sort((a, b) => b.finalScore - a.finalScore);
     const doneTasks = updatedTasks.filter((t) => t.status === "Done");
     setTasks([...todoAndDoing, ...doneTasks]);
 
-    // Lakukan pembaruan di background (DB)
     await updateTask(updatedTask.id, updatedTask);
 
-    // Panggil ulang fetch untuk memberlakukan limit 5 Done dan sinkronkan dengan komponen lain
     fetchTasks();
     window.dispatchEvent(new Event("tasks_updated"));
   };
@@ -191,7 +189,7 @@ export const useTasks = () => {
     if (window.confirm("Hapus tugas ini?")) {
       await deleteTask(id);
       fetchTasks();
-      window.dispatchEvent(new Event("tasks_updated")); 
+      window.dispatchEvent(new Event("tasks_updated"));
     }
   };
 
@@ -206,6 +204,6 @@ export const useTasks = () => {
     handleSubmit,
     onDragEnd,
     handleDelete,
-    fetchTasks
+    fetchTasks,
   };
 };

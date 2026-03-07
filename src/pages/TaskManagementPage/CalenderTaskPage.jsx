@@ -6,14 +6,14 @@ import { useTasks } from "../../hooks/useTasks";
 import CalendarWidget from "../../components/CalendarComponents/CalendarWidget";
 import SuggestionWidget from "../../components/CalendarComponents/SuggestionWidget";
 import AgendaList from "../../components/CalendarComponents/AgendaList";
-import TaskModal from "./TaskModal"; 
+import TaskModal from "./TaskModal";
 
 import { formatDateForDB } from "../../helpers/calendarUtils";
 import { gooeyToast } from "goey-toast";
 import { updateTask } from "../../services/taskServices";
 
 const CalenderTaskPage = () => {
-  const { tasks, fetchTasks } = useTasks();
+  const { tasks, fetchTasks, handleDelete } = useTasks();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentViewDate, setCurrentViewDate] = useState(new Date());
 
@@ -30,7 +30,10 @@ const CalenderTaskPage = () => {
   const formattedSelectedDate = formatDateForDB(selectedDate);
 
   const tasksOnSelectedDate = useMemo(() => {
-    return tasks.filter((t) => t.date_deadline === formattedSelectedDate);
+    return tasks.filter(
+      (t) =>
+        t.date_deadline && t.date_deadline.startsWith(formattedSelectedDate),
+    );
   }, [tasks, formattedSelectedDate]);
 
   const suggestedTasks = useMemo(() => {
@@ -40,7 +43,6 @@ const CalenderTaskPage = () => {
       .slice(0, 3);
   }, [tasks]);
 
-  // Handlers Kalender
   const handlePrevMonth = () =>
     setCurrentViewDate(
       new Date(
@@ -79,11 +81,10 @@ const CalenderTaskPage = () => {
     if (isEditMode) {
       try {
         await updateTask(formData.id, formData);
-  
+
         if (fetchTasks) {
           await fetchTasks();
         }
-
       } catch (error) {
         console.error("Gagal update:", error);
         gooeyToast.error("Gagal menyimpan perubahan");
@@ -116,6 +117,7 @@ const CalenderTaskPage = () => {
               selectedDate={selectedDate}
               tasks={tasksOnSelectedDate}
               onTaskClick={handleEditTaskClick}
+              onDeleteTask={handleDelete}
             />
           </div>
 

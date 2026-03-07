@@ -1,9 +1,14 @@
 import React from "react";
-import { BsCalendarEvent, BsArrowRight } from "react-icons/bs";
+import {
+  BsCalendarEvent,
+  BsArrowRight,
+  BsTrash,
+} from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { MONTH_NAMES, TASK_COLORS } from "../../helpers/calendarUtils";
+import { ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
 
-const AgendaList = ({ selectedDate, tasks, onTaskClick }) => {
+const AgendaList = ({ selectedDate, tasks, onTaskClick, onDeleteTask }) => {
   const activeTasks = tasks.filter((task) => !task.done);
 
   return (
@@ -42,7 +47,6 @@ const AgendaList = ({ selectedDate, tasks, onTaskClick }) => {
           <AnimatePresence>
             {activeTasks.map((task, index) => {
               const theme = TASK_COLORS[index % TASK_COLORS.length];
-
               return (
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
@@ -51,31 +55,39 @@ const AgendaList = ({ selectedDate, tasks, onTaskClick }) => {
                   transition={{ duration: 0.2 }}
                   key={task.id}
                   onClick={() => onTaskClick(task)}
-                  className={`group p-4 md:p-5 rounded-2xl border transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1 ${theme.bg} ${theme.border} ${theme.hoverBorder}`}
+                  className={`group p-4 md:p-5 rounded-2xl border transition-all duration-300 cursor-pointer hover:shadow-lg md:hover:-translate-y-1 ${theme.bg} ${theme.border} ${theme.hoverBorder}`}
                 >
                   <div className="flex justify-between items-center gap-4">
                     <div className="flex flex-col">
                       <h3
-                        className={`font-bold text-base md:text-lg mb-2 leading-tight ${theme.title}`}
+                        className={`font-bold text-base md:text-lg mb-2.5 leading-tight ${theme.title}`}
                       >
                         {task.title}
                       </h3>
 
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
-                        {task.finalScore > 0.7 && (
-                          <span className="flex items-center gap-1 bg-red-100/90 text-red-700 border-red-200 border text-[10px] md:text-xs font-black uppercase tracking-widest px-2 py-1 rounded-lg">
-                            <span>🔥</span> Hampir Telat
-                          </span>
-                        )}
-
-                        <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest bg-white/60 text-slate-600 px-2.5 py-1 rounded-lg border border-slate-200/60 shadow-sm">
-                          Status: {task.status}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ScoreBadge finalScore={task.finalScore} />
+                        <TimeBadge date_deadline={task.date_deadline} />
+                        <StatusBadge status={task.status} />
                       </div>
                     </div>
 
-                    <div className="shrink-0 w-8 h-8 rounded-full bg-white/50 border border-white/60 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                      <BsArrowRight className={`text-lg ${theme.title}`} />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteTask(e, task.id);
+                        }}
+                        className="w-8 h-8 rounded-full bg-red-50 text-red-500 border border-red-100 flex items-center justify-center transition-all duration-300 hover:bg-red-500 hover:text-white opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                        title="Hapus Tugas"
+                      >
+                        <BsTrash />
+                      </button>
+                      <div
+                        className={`w-8 h-8 rounded-full bg-white/50 border border-white/60 flex items-center justify-center transition-all duration-300 opacity-100 md:opacity-0 md:-translate-x-2 md:group-hover:opacity-100 md:group-hover:translate-x-0`}
+                      >
+                        <BsArrowRight className={`text-lg ${theme.title}`} />
+                      </div>
                     </div>
                   </div>
                 </motion.div>

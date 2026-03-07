@@ -31,7 +31,7 @@ const TaskModal = ({
               required
             />
             <input
-              type="date"
+              type="datetime-local"
               name="date_deadline"
               className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-slate-600"
               value={formData.date_deadline}

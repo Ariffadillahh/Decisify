@@ -29,7 +29,11 @@ const CalendarWidget = ({
     const dateToCheck = formatDateForDB(
       new Date(currentViewDate.getFullYear(), currentViewDate.getMonth(), day),
     );
-    return tasks.filter((t) => t.date_deadline === dateToCheck).length;
+
+    return tasks.filter(
+      (t) =>
+        t.date_deadline && t.date_deadline.startsWith(dateToCheck) && !t.done,
+    ).length;
   };
 
   return (
