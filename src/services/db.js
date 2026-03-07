@@ -1,13 +1,14 @@
 import Dexie from "dexie";
 
 const DB_NAME = "decisifyDB";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export const db = new Dexie(DB_NAME);
 
 db.version(DB_VERSION).stores({
   users: "++id",
-  tasks: "++id, userId",
+  category: "++id, name", 
+  tasks: "++id, userId, categoryId",
   notes: "++id, userId",
   focus_sessions: "++id",
 });

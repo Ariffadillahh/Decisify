@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { db } from "../../services/db";
 
 const TaskModal = ({
   isEditMode,
@@ -7,6 +8,26 @@ const TaskModal = ({
   handleSubmit,
   setIsModalOpen,
 }) => {
+  const [categories, setCategories] = useState([]);
+  const [isNewCategory, setIsNewCategory] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        // PERBAIKAN: Diubah menjadi db.category
+        const cats = await db.category.toArray();
+        setCategories(cats);
+
+        if (cats.length === 0) {
+          setIsNewCategory(true);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil kategori:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <div>
       <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
@@ -26,18 +47,85 @@ const TaskModal = ({
               name="title"
               placeholder="Nama Tugas..."
               className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold"
-              value={formData.title}
+              value={formData.title || ""}
               onChange={handleChange}
               required
             />
+
+            {/* --- INPUT KATEGORI DINAMIS --- */}
+            <div className="relative">
+              {categories.length > 0 && !isNewCategory ? (
+                <select
+                  name="category"
+                  value={formData.category || ""}
+                  onChange={(e) => {
+                    if (e.target.value === "NEW_CATEGORY") {
+                      setIsNewCategory(true);
+                      handleChange({ target: { name: "category", value: "" } });
+                    } else {
+                      handleChange(e);
+                    }
+                  }}
+                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-slate-600 appearance-none cursor-pointer"
+                  required
+                >
+                  <option value="" disabled>
+                    Pilih Kategori...
+                  </option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                  <option
+                    value="NEW_CATEGORY"
+                    className="font-bold text-indigo-600"
+                  >
+                    ➕ Buat Kategori Baru...
+                  </option>
+                </select>
+              ) : (
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="category"
+                    placeholder="Nama Kategori..."
+                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-slate-600 pr-20"
+                    value={formData.category || ""}
+                    onChange={handleChange}
+                    required
+                  />
+                  {categories.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNewCategory(false);
+                        handleChange({
+                          target: {
+                            name: "category",
+                            value: categories[0]?.name || "",
+                          },
+                        });
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest"
+                    >
+                      Batal
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* ------------------------------ */}
+
             <input
               type="datetime-local"
               name="date_deadline"
               className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-slate-600"
-              value={formData.date_deadline}
+              value={formData.date_deadline || ""}
               onChange={handleChange}
               required
             />
+
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                 <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">
@@ -49,7 +137,7 @@ const TaskModal = ({
                   min="1"
                   max="5"
                   className="w-full bg-transparent font-bold outline-none text-indigo-600"
-                  value={formData.tingkat_kesulitan}
+                  value={formData.tingkat_kesulitan || 1}
                   onChange={handleChange}
                 />
               </div>
@@ -62,11 +150,12 @@ const TaskModal = ({
                   name="estimasi_jam"
                   min="1"
                   className="w-full bg-transparent font-bold outline-none text-indigo-600"
-                  value={formData.estimasi_jam}
+                  value={formData.estimasi_jam || 1}
                   onChange={handleChange}
                 />
               </div>
             </div>
+
             <div className="flex gap-4 pt-4">
               <button
                 type="button"

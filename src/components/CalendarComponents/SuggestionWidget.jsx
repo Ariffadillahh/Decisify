@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { BsStars } from "react-icons/bs";
-import { ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
+import { CategoryBadge, ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
 
 const SuggestionWidget = ({ suggestedTasks }) => {
   return (
@@ -35,6 +35,7 @@ const SuggestionWidget = ({ suggestedTasks }) => {
                     {task.title}
                   </p>
                   <div className="space-y-2">
+                    <CategoryBadge category={task.categoryName} />
                     <ScoreBadge finalScore={task.finalScore} />
                     <TimeBadge date_deadline={task.date_deadline} />
                   </div>

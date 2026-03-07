@@ -104,3 +104,37 @@ export const deleteTask = async (id) => {
 
   return { success: true };
 };
+
+export const getArchivedTasks = async () => {
+  const allTasks = await db.tasks.toArray();
+  const archived = allTasks.filter((task) => task.archived === true);
+  return archived.sort((a, b) => (b.completedAt || b.id) - (a.completedAt || a.id));
+};
+
+export const restoreArchivedTask = async (task) => {
+  const restoredTask = {
+    ...task,
+    archived: false,
+    done: false,
+    status: "Todo",
+  };
+  await updateTask(task.id, restoredTask);
+  return restoredTask;
+};
+
+export const reopenArchivedTask = async (id, dataFromForm) => {
+  const numericId = Number(id); 
+
+  const newScore = calculateFinalScore(dataFromForm);
+
+  await db.tasks.update(numericId, {
+    ...dataFromForm, 
+    finalScore: newScore, 
+    archived: false, 
+    done: false, 
+    status: "Backlog", 
+    completedAt: undefined,
+  });
+
+  return await db.tasks.get(numericId);
+};

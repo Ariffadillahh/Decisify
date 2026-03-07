@@ -1,12 +1,8 @@
 import React from "react";
-import {
-  BsCalendarEvent,
-  BsArrowRight,
-  BsTrash,
-} from "react-icons/bs";
+import { BsCalendarEvent, BsArrowRight, BsTrash } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { MONTH_NAMES, TASK_COLORS } from "../../helpers/calendarUtils";
-import { ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
+import { CategoryBadge, ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
 
 const AgendaList = ({ selectedDate, tasks, onTaskClick, onDeleteTask }) => {
   const activeTasks = tasks.filter((task) => !task.done);
@@ -66,6 +62,7 @@ const AgendaList = ({ selectedDate, tasks, onTaskClick, onDeleteTask }) => {
                       </h3>
 
                       <div className="flex flex-wrap items-center gap-2">
+                        <CategoryBadge category={task.categoryName} />
                         <ScoreBadge finalScore={task.finalScore} />
                         <TimeBadge date_deadline={task.date_deadline} />
                         <StatusBadge status={task.status} />
