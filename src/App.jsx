@@ -10,6 +10,7 @@ import "goey-toast/styles.css";
 import KanbanTaskPage from "./pages/TaskManagementPage/KanbanTaskPage";
 import CalenderTaskPage from "./pages/TaskManagementPage/CalenderTaskPage";
 import ArchiveTaskPage from "./pages/TaskManagementPage/ArchiveTaskPage";
+import NotesPage from "./pages/Notes/NotesPage";
 
 const App = () => {
   return (
@@ -24,6 +25,8 @@ const App = () => {
           <Route path="/tasks" element={<CalenderTaskPage />} />
           <Route path="/tasks/kanban" element={<KanbanTaskPage />} />
           <Route path="/tasks/archive" element={<ArchiveTaskPage />} />
+          <Route path="/notes" element={<NotesPage />} />
+          <Route path="/notes/:noteId" element={<NotesPage />} />
         </Route>
       </Routes>
     </>

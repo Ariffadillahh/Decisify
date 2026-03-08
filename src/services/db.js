@@ -7,8 +7,9 @@ export const db = new Dexie(DB_NAME);
 
 db.version(DB_VERSION).stores({
   users: "++id",
-  category: "++id, name", 
+  category: "++id, name",
   tasks: "++id, userId, categoryId",
-  notes: "++id, userId",
+  folders: "++id, name, parentId", // parentId null berarti folder root
+  notes: "++id, title, folderId, content, updatedAt",
   focus_sessions: "++id",
 });
