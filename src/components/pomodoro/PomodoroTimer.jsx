@@ -118,7 +118,7 @@ const PomodoroTimer = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => pomodoro.setIsOpen(true)}
-          className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 bg-indigo-600 rounded-full shadow-lg text-white"
+          className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 bg-[#007BFF] rounded-full shadow-lg text-white"
           title="Pomodoro Timer"
         >
           <MdTimer size={24} />

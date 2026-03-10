@@ -1,71 +1,141 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { MdDashboard, MdClose } from "react-icons/md";
-import { GrTasks } from "react-icons/gr";
-import { CgNotes } from "react-icons/cg";
-import { IoArchiveSharp } from "react-icons/io5";
-import { LuUniversity } from "react-icons/lu";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { BiTask } from "react-icons/bi";
+import { FiClock } from "react-icons/fi";
+import { HiOutlineDocumentText } from "react-icons/hi";
+import { useTasks } from "../hooks/useTasks";
+import { GetUrgencyTheme } from "./TaskBadge";
 
-const menu = [
-  { icon: MdDashboard, label: "Dashboard", path: "/dashboard", type: "link" },
-  { icon: GrTasks, label: "Task Management", path: "/tasks", type: "link" },
-  { icon: CgNotes, label: "Notes", path: "/notes", type: "link" },
+const mainMenu = [
+  { label: "Dasbor", path: "/dashboard", icon: MdOutlineSpaceDashboard },
+  { label: "Daftar Tugas", path: "/tasks", icon: BiTask, badge: 12 },
+  { label: "Kalender", path: "/calendar", icon: FiClock },
+  { label: "Catatan", path: "/notes", icon: HiOutlineDocumentText },
 ];
 
-const Sidebars = () => {
+const Sidebar = () => {
+  const location = useLocation();
+  const currentPath =
+    location.pathname === "/" ? "/dashboard" : location.pathname;
+
+  const { tasks } = useTasks();
+
+  const suggestedTasks = useMemo(() => {
+    return tasks
+      .filter((t) => !t.done && t.status !== "Done")
+      .sort((a, b) => b.finalScore - a.finalScore)
+      .slice(0, 3);
+  }, [tasks]);
+
   return (
-    <>
-      <div className="fixed z-[60] bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] md:bottom-auto md:left-4 md:top-1/2 md:-translate-y-1/2 md:-translate-x-0 md:w-auto transition-all duration-500">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 flex flex-row items-center justify-around px-4 h-16 md:flex-col md:w-16 md:h-auto md:py-5 md:px-0 md:gap-6 md:justify-start">
-          <Link to="/dashboard" className="hidden md:flex">
-            <div className="relative group p-2">
-              <LuUniversity className="text-gray-800" size={26} />
-            </div>
-          </Link>
+    <div className="w-[280px] bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 font-sans flex flex-col h-full overflow-y-auto custom-scrollbar">
+      <div className="mb-8">
+        <h3 className="text-[11px] font-bold text-slate-400 mb-4 tracking-wider uppercase">
+          Menu Utama
+        </h3>
 
-          <div className="w-px h-8 bg-gray-200 md:w-8 md:h-px hidden md:flex"></div>
-
-          {menu.map((item, index) => {
+        <ul className="flex flex-col gap-1">
+          {mainMenu.map((item, index) => {
             const Icon = item.icon;
-            const active =
-              location.pathname === item.path && item.type !== "modal";
+            const isActive = currentPath === item.path;
 
             return (
-              <div key={index} className="flex items-center justify-center">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() =>
-                    item.type === "modal"
-                      ? setIsArchiveOpen(!isArchiveOpen)
-                      : null
-                  }
-                  className={`relative group p-2.5 rounded-xl transition-all duration-300 cursor-pointer
-                  ${
-                    active || (item.type === "modal" && isArchiveOpen)
-                      ? "bg-black text-white shadow-md shadow-black/20"
-                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+              <li key={index}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-200 ${
+                    isActive
+                      ? "bg-[#007BFF] text-white shadow-md shadow-blue-500/20"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
-                  {item.type === "modal" ? (
-                    <Icon size={22} />
-                  ) : (
-                    <Link to={item.path}>
-                      <Icon size={22} />
-                    </Link>
+                  <Icon
+                    size={22}
+                    className={isActive ? "text-white" : "text-slate-500"}
+                  />
+                  <span className="font-medium text-sm">{item.label}</span>
+
+                  {item.badge && (
+                    <span
+                      className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-md ${
+                        isActive
+                          ? "bg-white/20 text-white"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
                   )}
-                  <span className="hidden md:block absolute left-14 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 bg-gray-800 text-white text-[10px] px-3 py-1.5 rounded-lg whitespace-nowrap pointer-events-none shadow-md transition-all duration-300">
-                    {item.label}
-                  </span>
-                </motion.div>
-              </div>
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
-    </>
+
+      <hr className="border-t border-slate-100 mb-8 w-[85%] mx-auto" />
+
+      <div>
+        <h3 className="text-[11px] font-bold text-slate-400 mb-4 tracking-wider uppercase">
+          Suggestion Focus
+        </h3>
+
+        {suggestedTasks.length === 0 ? (
+          <div className="px-5 text-slate-400 text-xs font-medium">
+            Belum ada tugas saat ini.
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-5 px-5 mt-2">
+            {suggestedTasks.map((task, index) => {
+              const score = task.finalScore || 0;
+              const theme = GetUrgencyTheme(score);
+              const category = task.categoryName || "";
+
+              return (
+                <li
+                  key={task.id || index}
+                  className="flex items-center gap-4 cursor-pointer group relative"
+                >
+                  <div className="relative flex items-center justify-center">
+                    <div
+                      className={`w-3 h-3 rounded-full ${theme.dot} group-hover:scale-125 transition-transform duration-200 shadow-sm`}
+                    ></div>
+
+                    <div className="absolute left-6 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 whitespace-nowrap">
+                      <div
+                        className={`${theme.tooltip} text-white text-[10px] font-bold px-2.5 py-1.5 rounded-md shadow-lg flex items-center gap-1.5`}
+                      >
+                        {theme.label && <span>{theme.label}</span>}
+
+                        {theme.label && category && (
+                          <span className="text-white/40">|</span>
+                        )}
+
+                        {category && (
+                          <span className="text-white/90">{category}</span>
+                        )}
+
+                        {!theme.label && !category && <span>Tugas</span>}
+
+                        <div
+                          className={`absolute top-1/2 -left-1 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-r-4 ${theme.arrow}`}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="font-medium text-sm text-slate-600 group-hover:text-slate-900 transition-colors truncate">
+                    {task.title}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default Sidebars;
+export default Sidebar;

@@ -66,7 +66,7 @@ const PomodoroSetupModal = ({
           >
             <h3 className="text-lg md:text-3xl font-black text-slate-900 mb-6 md:mb-8 tracking-tight flex items-center justify-between">
               <span>Pomodoro Setup</span>
-              <MdTimer className="text-indigo-600 md:text-4xl" size={26} />
+              <MdTimer className="text-[#007BFF] md:text-4xl" size={26} />
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 flex-1 min-h-0">
@@ -78,7 +78,7 @@ const PomodoroSetupModal = ({
                   {availableTasks.length > 0 && (
                     <button
                       onClick={handleToggleSelectAll}
-                      className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded-md"
+                      className="flex items-center gap-1.5 text-xs font-bold text-[#007BFF] hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded-md"
                     >
                       {isAllSelected ? (
                         <>
@@ -134,7 +134,7 @@ const PomodoroSetupModal = ({
                             type="checkbox"
                             checked={selectedTaskIds.includes(task.id)}
                             onChange={() => handleToggleTaskSelection(task.id)}
-                            className="peer appearance-none w-5 h-5 border-2 border-slate-200 rounded-md checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all cursor-pointer"
+                            className="peer appearance-none w-5 h-5 border-2 border-slate-200 rounded-md checked:bg-[#007BFF] checked:border-[#007BFF] focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all cursor-pointer"
                           />
                           <svg
                             className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity duration-200"
@@ -190,7 +190,7 @@ const PomodoroSetupModal = ({
                           setFocusDuration(parseInt(e.target.value) || 0)
                         }
                         min="1"
-                        className="w-full mt-1 bg-transparent p-1 rounded-lg font-black text-indigo-600 outline-none text-center text-xl md:text-3xl tabular-nums focus:ring-0 focus:border-0"
+                        className="w-full mt-1 bg-transparent p-1 rounded-lg font-black text-[#007BFF] outline-none text-center text-xl md:text-3xl tabular-nums focus:ring-0 focus:border-0"
                       />
                     </div>
                     <div className="bg-slate-50 border border-slate-100 p-2 md:p-3 rounded-2xl">
@@ -244,7 +244,7 @@ const PomodoroSetupModal = ({
               </button>
               <button
                 onClick={handleStartFocus}
-                className="flex-[2] bg-indigo-600 hover:bg-indigo-700 transition py-3 md:py-4 rounded-xl md:rounded-2xl text-sm md:text-lg text-white font-black shadow-xl shadow-indigo-200/50 active:scale-[0.98]"
+                className="flex-[2] bg-[#007BFF] hover:bg-indigo-700 transition py-3 md:py-4 rounded-xl md:rounded-2xl text-sm md:text-lg text-white font-black shadow-xl shadow-indigo-200/50 active:scale-[0.98]"
               >
                 Mulai Sesi Fokus
               </button>

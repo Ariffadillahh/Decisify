@@ -24,26 +24,41 @@ const initialFormState = {
 export const useTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [archivedTasks, setArchivedTasks] = useState([]);
-
+  const [allRawTasks, setAllRawTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [formData, setFormData] = useState(initialFormState);
 
   const fetchTasks = useCallback(async () => {
-    const data = await getAllTasks();
-    const now = new Date().getTime();
+    // 1. Ambil SEMUA data mentah langsung dari tabel (tanpa filter apapun)
+    const rawAllData = await db.tasks.toArray();
 
+    // 2. Ambil data yang difilter untuk kebutuhan Kanban board
+    const data = await getAllTasks();
+
+    const now = new Date().getTime();
     const categories = await db.category.toArray();
     const categoryMap = categories.reduce((acc, cat) => {
       acc[cat.id] = cat.name;
       return acc;
     }, {});
 
+    // --- NORMALISASI KHUSUS PROGRESS BAR (SEMUA TUGAS) ---
+    const normalizedAll = rawAllData.map((task) => {
+      return {
+        ...task,
+        status: task.status || "Backlog",
+        done: task.status === "Done",
+      };
+    });
+    // Sekarang state ini pasti berisi full 8/8 data dari DB!
+    setAllRawTasks(normalizedAll);
+
+    // --- NORMALISASI KHUSUS KANBAN BOARD ---
     const normalized = data.map((task) => {
       const resolvedCategoryName =
         categoryMap[task.categoryId] || task.category || "";
-
       return {
         ...task,
         categoryName: resolvedCategoryName,
@@ -228,14 +243,11 @@ export const useTasks = () => {
     window.dispatchEvent(new Event("tasks_updated"));
   };
 
-  const handleDelete = async (e, id) => {
-    e.stopPropagation();
-    if (window.confirm("Hapus tugas ini?")) {
-      await deleteTask(id);
-      fetchTasks();
-      window.dispatchEvent(new Event("tasks_updated"));
-      gooeyToast.success("Tugas dihapus.");
-    }
+  const handleDelete = async (id) => {
+    await deleteTask(id);
+    fetchTasks();
+    window.dispatchEvent(new Event("tasks_updated"));
+    gooeyToast.success("Tugas dihapus.");
   };
 
   const fetchArchivedTasks = async () => {
@@ -305,7 +317,7 @@ export const useTasks = () => {
     handleSubmit,
     onDragEnd,
     handleDelete,
-
+    allRawTasks,
     archivedTasks,
     fetchArchivedTasks,
     handleRestoreTask,

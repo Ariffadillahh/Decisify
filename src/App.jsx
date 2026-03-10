@@ -22,9 +22,9 @@ const App = () => {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/tasks" element={<CalenderTaskPage />} />
-          <Route path="/tasks/kanban" element={<KanbanTaskPage />} />
-          <Route path="/tasks/archive" element={<ArchiveTaskPage />} />
+          <Route path="/calendar" element={<CalenderTaskPage />} />
+          <Route path="/tasks" element={<KanbanTaskPage />} />
+          <Route path="/archive" element={<ArchiveTaskPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/notes/:noteId" element={<NotesPage />} />
         </Route>

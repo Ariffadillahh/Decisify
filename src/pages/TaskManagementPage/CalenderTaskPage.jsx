@@ -19,7 +19,8 @@ const CalenderTaskPage = () => {
     formData,
     handleChange,
     handleSubmit,
-    openModal, 
+    openModal,
+    allRawTasks,
   } = useTasks();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -58,11 +59,17 @@ const CalenderTaskPage = () => {
       ),
     );
 
+  const handleGoToToday = () => {
+    const today = new Date();
+    setSelectedDate(today);
+    setCurrentViewDate(today);
+  };
+
   return (
     <TaskLayouts>
-      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col py-6 md:py-8 px-4 md:px-8 relative">
+      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col pl-4 md:pl-8 relative">
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
-          <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0">
+          <div className="w-full lg:w-[60%] flex flex-col gap-6 shrink-0">
             <CalendarWidget
               currentViewDate={currentViewDate}
               selectedDate={selectedDate}
@@ -70,6 +77,7 @@ const CalenderTaskPage = () => {
               onPrevMonth={handlePrevMonth}
               onNextMonth={handleNextMonth}
               onSelectDate={setSelectedDate}
+              onGoToToday={handleGoToToday}
             />
             <SuggestionWidget suggestedTasks={suggestedTasks} />
           </div>
@@ -77,7 +85,8 @@ const CalenderTaskPage = () => {
           <AgendaList
             selectedDate={selectedDate}
             tasks={tasksOnSelectedDate}
-            onTaskClick={openModal} 
+            allTasks={allRawTasks}
+            onTaskClick={openModal}
             onDeleteTask={handleDelete}
           />
         </div>

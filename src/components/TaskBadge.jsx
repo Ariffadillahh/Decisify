@@ -79,3 +79,28 @@ export const CategoryBadge = ({ category }) => {
     </span>
   );
 };
+
+export const GetUrgencyTheme = (score = 0) => {
+  if (score >= 1) {
+    return {
+      dot: "bg-red-500 shadow-red-500/50",
+      tooltip: "bg-red-600",
+      arrow: "border-r-red-600",
+      label: "Telat",
+    };
+  }
+  if (score > 0.7) {
+    return {
+      dot: "bg-orange-500 shadow-orange-500/50",
+      tooltip: "bg-orange-600",
+      arrow: "border-r-orange-600",
+      label: "Urgent",
+    };
+  }
+  return {
+    dot: "bg-[#007BFF] shadow-blue-500/50",
+    tooltip: "bg-slate-800",
+    arrow: "border-r-slate-800",
+    label: "",
+  };
+};

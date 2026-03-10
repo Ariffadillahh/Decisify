@@ -69,9 +69,9 @@ const ArchiveTaskPage = () => {
   };
 
   return (
-    <MainLayouts>
+    <>
       <TaskLayouts>
-        <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col py-6 md:py-8 px-4 md:px-8">
+        <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
             <div>
               <h1 className="text-2xl font-black text-slate-800">
@@ -195,7 +195,7 @@ const ArchiveTaskPage = () => {
           )}
         </div>
       </TaskLayouts>
-    </MainLayouts>
+    </>
   );
 };
 
