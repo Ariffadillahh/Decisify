@@ -5,7 +5,7 @@ import NavbarDashboard from "../components/Dashboard/NavbarDashboard";
 
 const MainLayouts = ({ children }) => {
   const location = useLocation();
-  const excludedPaths = ["/", "/welcome"];
+  const excludedPaths = ["/"];
   const showWidget = !excludedPaths.includes(location.pathname);
 
   if (!showWidget) {

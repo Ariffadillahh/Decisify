@@ -3,13 +3,12 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useTasks } from "../../hooks/useTasks";
 import TaskLayouts from "./TaskLayouts";
 import TaskModal from "./TaskModal";
-import {
-  ScoreBadge,
-  TimeBadge,
-  StatusBadge,
-  CategoryBadge,
-} from "../../components/TaskBadge";
+import { ScoreBadge, CategoryBadge } from "../../components/TaskBadge";
 import ConfirmDeleteModal from "../../components/Modal/ConfirmDeleteModal";
+
+import { FiPlus, FiCornerUpLeft } from "react-icons/fi";
+import { db } from "../../services/db";
+import { BsTrash } from "react-icons/bs";
 
 const columns = ["Backlog", "Todo", "Doing", "Done"];
 
@@ -40,6 +39,40 @@ const columnAccent = {
   },
 };
 
+const getRelativeTimeString = (dateString) => {
+  if (!dateString) return { text: "No Date", color: "text-slate-400" };
+
+  const deadline = new Date(dateString);
+  const now = new Date();
+
+  const deadlineDate = new Date(deadline.setHours(0, 0, 0, 0));
+  const todayDate = new Date(now.setHours(0, 0, 0, 0));
+
+  const diffTime = deadlineDate - todayDate;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return { text: "Terlewat", color: "text-red-600" };
+  if (diffDays === 0)
+    return { text: "Hari Ini", color: "text-red-500 font-bold" };
+  if (diffDays === 1)
+    return { text: "Besok", color: "text-orange-500 font-bold" };
+  if (diffDays <= 3)
+    return { text: `${diffDays} hari lagi`, color: "text-blue-500 font-bold" };
+
+  const options = { day: "numeric", month: "short" };
+  return {
+    text: new Date(dateString).toLocaleDateString("id-ID", options),
+    color: "text-slate-500",
+  };
+};
+
+const extractTime = (dateString) => {
+  if (!dateString) return "23:59";
+  if (dateString.includes("T")) return dateString.split("T")[1].substring(0, 5);
+  if (dateString.includes(" ")) return dateString.split(" ")[1].substring(0, 5);
+  return "23:59";
+};
+
 const KanbanTaskPage = () => {
   const {
     tasks,
@@ -52,6 +85,7 @@ const KanbanTaskPage = () => {
     formData,
     handleChange,
     handleSubmit,
+    fetchTasks,
   } = useTasks();
 
   const [screenSize, setScreenSize] = useState("mobile");
@@ -81,7 +115,6 @@ const KanbanTaskPage = () => {
 
   const handleConfirmDelete = () => {
     if (taskToDelete) {
-      // FIX ERROR: Mengirim fake event agar useTasks.js tidak crash saat memanggil e.stopPropagation()
       const fakeEvent = { stopPropagation: () => {} };
       handleDelete(fakeEvent, taskToDelete);
     }
@@ -89,174 +122,158 @@ const KanbanTaskPage = () => {
     setTaskToDelete(null);
   };
 
+  const handleMoveToBacklog = async (e, task) => {
+    e.stopPropagation();
+    try {
+      await db.tasks.update(task.id, {
+        status: "Backlog",
+        done: false,
+        completedAt: null,
+      });
+      fetchTasks();
+      window.dispatchEvent(new Event("tasks_updated"));
+    } catch (error) {
+      console.error("Gagal memindah tugas", error);
+    }
+  };
+
+  const renderTaskCard = (task, provided, snapshot) => {
+    const timeInfo = getRelativeTimeString(task.date_deadline);
+    const clockTime = extractTime(task.date_deadline);
+
+    return (
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={provided.draggableProps.style}
+        onClick={() => openModal(task)}
+        className={`group bg-white rounded-[1.25rem] border border-slate-100 p-4 transition-all duration-200 cursor-pointer relative shrink-0
+          ${isMobile ? "w-[280px]" : "w-full"} 
+          ${snapshot.isDragging ? "rotate-2 shadow-2xl ring-2 ring-indigo-400 scale-[1.02] z-50" : "shadow-sm hover:shadow-md hover:border-slate-200"} 
+          ${task.done ? "opacity-60 bg-slate-50" : ""}
+        `}
+      >
+        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all z-10 bg-white/80 backdrop-blur-sm rounded-md px-1">
+          {task.status !== "Backlog" && (
+            <button
+              onClick={(e) => handleMoveToBacklog(e, task)}
+              className="text-slate-400 hover:text-indigo-500 p-1"
+              title="Kembalikan ke Backlog"
+            >
+              <FiCornerUpLeft size={14} />
+            </button>
+          )}
+          <button
+            onClick={(e) => handleDeleteClick(e, task.id)}
+            className="text-slate-400 hover:text-red-500 p-1"
+            title="Hapus Tugas"
+          >
+            <BsTrash size={13} />
+          </button>
+        </div>
+
+        {!task.done && (
+          <div className="mb-3">
+            <ScoreBadge finalScore={task.finalScore} />
+          </div>
+        )}
+
+        <div className="mb-4 pr-6">
+          <h4
+            className={`text-sm md:text-[15px] font-bold text-slate-800 leading-snug tracking-tight ${task.done ? "line-through text-slate-400" : ""}`}
+          >
+            {task.title}
+          </h4>
+        </div>
+
+        <div className="flex items-center justify-between mt-auto pt-1">
+          <CategoryBadge category={task.categoryName} />
+
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[11px] font-semibold ${timeInfo.color}`}>
+              {timeInfo.text}
+            </span>
+            <span className="text-[9px] text-slate-300">•</span>
+            <span className="text-[11px] font-semibold text-slate-400">
+              {clockTime} WIB
+            </span>
+          </div>
+        </div>
+
+        {task.done && (
+          <div className="absolute bottom-4 right-4">
+            <span className="text-[9px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wider">
+              Done
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <TaskLayouts>
-      <div className="min-h-screen font-sans text-slate-900 w-full flex flex-col py-2 md:py-8 pb-24 md:pb-8 px-0 md:px-6 relative">
+      <div className="min-h-screen font-sans text-slate-900 w-full flex flex-col py-2 md:py-6 pb-24 md:pb-6 px-0 md:px-6 relative">
+        <div className="flex justify-between items-center ml-3 md:ml-10 mb-6 mt-2 pr-4 md:pr-0">
+          <div>
+            <h1 className="text-xl md:text-2xl font-black text-slate-800">
+              Kanban Board
+            </h1>
+            <p className="text-xs md:text-sm text-slate-500 font-medium">
+              Kelola dan pantau progres tugas Anda.
+            </p>
+          </div>
+          <button
+            onClick={() => openModal(null)}
+            className="flex items-center gap-2 bg-[#007BFF] hover:bg-blue-600 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-md shadow-blue-500/20 active:scale-95"
+          >
+            <FiPlus size={18} />
+            <span className="hidden sm:block">Create Task</span>
+          </button>
+        </div>
+
         <DragDropContext onDragEnd={onDragEnd}>
           {/* ── MOBILE: 4 rows, each scrolls horizontally ── */}
           {isMobile && (
-            <div className="flex flex-col gap-3 px-3">
+            <div className="flex flex-col gap-5 px-3">
               {columns.map((col) => {
                 const accent = columnAccent[col];
                 const colTasks = tasks.filter((t) => t.status === col);
 
                 return (
                   <div key={col} className="flex flex-col">
-                    {/* Header */}
-                    <div className="flex items-center gap-2 mb-2 px-1">
-                      <span className={`w-2 h-2 rounded-full ${accent.dot}`} />
-
-                      <h2
-                        className={`font-bold uppercase text-[11px] tracking-widest ${accent.label}`}
-                      >
-                        {col}
-                      </h2>
-
-                      <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${accent.badge}`}
-                      >
-                        {colTasks.length}
-                      </span>
+                    <div className="flex items-center justify-between mb-2 px-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full ${accent.dot}`}
+                        />
+                        <h2
+                          className={`font-bold uppercase text-[11px] tracking-widest ${accent.label}`}
+                        >
+                          {col}
+                        </h2>
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${accent.badge}`}
+                        >
+                          {colTasks.length}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Horizontal lane */}
                     <Droppable droppableId={col} direction="horizontal">
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`flex gap-3 overflow-x-auto pb-3 px-1 min-h-[140px] rounded-xl hide-scrollbar
-                ${snapshot.isDraggingOver ? accent.drag : ""}`}
-                        >
-                          {colTasks.map((task, index) => (
-                            <Draggable
-                              key={task.id}
-                              draggableId={task.id.toString()}
-                              index={index}
-                            >
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  style={provided.draggableProps.style}
-                                  onClick={() => openModal(task)}
-                                  className={`bg-white rounded-xl border w-[200px] shrink-0
-                        ${
-                          snapshot.isDragging
-                            ? "rotate-2 shadow-xl ring-2 ring-indigo-400"
-                            : "shadow-sm border-slate-100"
-                        }`}
-                                >
-                                  <div className="p-3 flex flex-col h-full">
-                                    <div className="flex justify-between items-start mb-2">
-                                      {!task.done && (
-                                        <ScoreBadge
-                                          finalScore={task.finalScore}
-                                        />
-                                      )}
-
-                                      <button
-                                        onClick={(e) =>
-                                          handleDeleteClick(e, task.id)
-                                        }
-                                        className="text-slate-300 hover:text-red-400"
-                                      >
-                                        ✕
-                                      </button>
-                                    </div>
-
-                                    <h4 className="text-xs font-semibold mb-2">
-                                      {task.title}
-                                    </h4>
-
-                                    <div className="mt-auto flex flex-wrap gap-1">
-                                      <CategoryBadge
-                                        category={task.categoryName}
-                                      />
-                                      <TimeBadge
-                                        date_deadline={task.date_deadline}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-
-                    <div className="mt-2 border-b border-slate-100" />
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* ── TABLET: 2x2 grid ── */}
-          {isTablet && (
-            <div className="grid grid-cols-2 gap-4 px-4">
-              {columns.map((col) => {
-                const accent = columnAccent[col];
-                const colTasks = tasks.filter((t) => t.status === col);
-
-                return (
-                  <div
-                    key={col}
-                    className="flex flex-col bg-slate-100/50 rounded-2xl border border-slate-200/70 overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200/60">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-2 h-2 rounded-full ${accent.dot}`}
-                        />
-                        <h2
-                          className={`font-bold uppercase text-[11px] tracking-widest ${accent.label}`}
-                        >
-                          {col}
-                        </h2>
-                      </div>
-                      <span
-                        className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${accent.badge}`}
-                      >
-                        {colTasks.length}
-                      </span>
-                    </div>
-
-                    <Droppable droppableId={col} direction="vertical">
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className={`flex flex-col gap-2.5 p-2.5 min-h-[160px] transition-colors duration-150 ${
-                            snapshot.isDraggingOver
-                              ? accent.drag
-                              : "bg-transparent"
+                          className={`flex gap-3 overflow-x-auto pb-4 px-1 min-h-[160px] rounded-xl hide-scrollbar snap-x ${
+                            snapshot.isDraggingOver ? accent.drag : ""
                           }`}
                         >
                           {colTasks.length === 0 &&
                             !snapshot.isDraggingOver && (
-                              <div className="flex flex-col items-center justify-center py-8 text-slate-300 gap-2 select-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="w-6 h-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={1.5}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                                  />
-                                </svg>
-                                <span className="text-xs font-medium">
-                                  Kosong
-                                </span>
+                              <div className="flex items-center justify-center w-full text-slate-300 text-xs font-medium select-none border-2 border-dashed border-slate-200 rounded-[1.25rem]">
+                                Kosong
                               </div>
                             )}
 
@@ -266,75 +283,9 @@ const KanbanTaskPage = () => {
                               draggableId={task.id.toString()}
                               index={index}
                             >
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  style={provided.draggableProps.style}
-                                  onClick={() => openModal(task)}
-                                  className={`group bg-white rounded-xl border transition-all duration-200 cursor-pointer ${
-                                    snapshot.isDragging
-                                      ? "rotate-1 shadow-2xl ring-2 ring-indigo-400 scale-[1.03] z-50"
-                                      : "shadow-sm border-slate-100 hover:shadow-md hover:-translate-y-0.5"
-                                  } ${task.done ? "opacity-60 bg-slate-50" : ""}`}
-                                >
-                                  <div className="p-3">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        {!task.done && (
-                                          <ScoreBadge
-                                            finalScore={task.finalScore}
-                                          />
-                                        )}
-                                      </div>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDelete(e, task.id);
-                                        }}
-                                        className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all p-1 rounded-lg -mt-0.5 -mr-0.5 focus:opacity-100"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-3.5 w-3.5"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2.5}
-                                            d="M6 18L18 6M6 6l12 12"
-                                          />
-                                        </svg>
-                                      </button>
-                                    </div>
-                                    <h4
-                                      className={`text-sm font-semibold leading-snug mb-2.5 ${task.done ? "line-through text-slate-400" : "text-slate-800"}`}
-                                    >
-                                      {task.title}
-                                    </h4>
-                                    <div className="flex flex-wrap items-center gap-1.5">
-                                      <CategoryBadge
-                                        category={task.categoryName}
-                                      />
-                                      <TimeBadge
-                                        date_deadline={task.date_deadline}
-                                      />
-                                      <StatusBadge status={task.status} />
-                                    </div>
-                                  </div>
-                                  {task.done && (
-                                    <div className="flex items-center border-t border-slate-100 px-3 py-2">
-                                      <span className="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                                        Archive
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
+                              {(provided, snapshot) =>
+                                renderTaskCard(task, provided, snapshot)
+                              }
                             </Draggable>
                           ))}
                           {provided.placeholder}
@@ -347,9 +298,11 @@ const KanbanTaskPage = () => {
             </div>
           )}
 
-          {/* ── DESKTOP: 4 columns grid ── */}
-          {!isMobile && !isTablet && (
-            <div className="grid grid-cols-4 gap-5 items-start ml-10">
+          {/* ── DESKTOP & TABLET: Grid Layout ── */}
+          {!isMobile && (
+            <div
+              className={`grid gap-5 items-start ml-4 md:ml-10 ${isTablet ? "grid-cols-2 px-4 pb-8" : "grid-cols-4"}`}
+            >
               {columns.map((col) => {
                 const accent = columnAccent[col];
                 const colTasks = tasks.filter((t) => t.status === col);
@@ -357,22 +310,21 @@ const KanbanTaskPage = () => {
                 return (
                   <div
                     key={col}
-                    className="flex flex-col bg-slate-100/50 rounded-2xl border border-slate-200/70 overflow-hidden"
+                    className={`flex flex-col bg-slate-50/50 rounded-3xl border border-slate-200/60 overflow-hidden ${isTablet ? "h-[450px]" : ""}`}
                   >
-                    {/* Column header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200/60">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200/50">
+                      <div className="flex items-center gap-2.5">
                         <span
-                          className={`w-2 h-2 rounded-full ${accent.dot}`}
+                          className={`w-2.5 h-2.5 rounded-full ${accent.dot}`}
                         />
                         <h2
-                          className={`font-bold uppercase text-[11px] tracking-widest ${accent.label}`}
+                          className={`font-bold uppercase text-xs tracking-widest ${accent.label}`}
                         >
                           {col}
                         </h2>
                       </div>
                       <span
-                        className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${accent.badge}`}
+                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${accent.badge}`}
                       >
                         {colTasks.length}
                       </span>
@@ -383,7 +335,7 @@ const KanbanTaskPage = () => {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`flex flex-col gap-2.5 p-2.5 min-h-[200px] transition-colors duration-150 ${
+                          className={`flex flex-col flex-1 overflow-y-auto overflow-x-hidden gap-3 p-3 min-h-[200px] transition-colors duration-150 custom-scrollbar ${
                             snapshot.isDraggingOver
                               ? accent.drag
                               : "bg-transparent"
@@ -391,21 +343,7 @@ const KanbanTaskPage = () => {
                         >
                           {colTasks.length === 0 &&
                             !snapshot.isDraggingOver && (
-                              <div className="flex flex-col items-center justify-center py-10 text-slate-300 gap-2 select-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="w-7 h-7"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={1.5}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                                  />
-                                </svg>
+                              <div className="flex flex-col items-center justify-center py-10 text-slate-300 select-none">
                                 <span className="text-xs font-medium">
                                   Kosong
                                 </span>
@@ -418,79 +356,9 @@ const KanbanTaskPage = () => {
                               draggableId={task.id.toString()}
                               index={index}
                             >
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  style={provided.draggableProps.style}
-                                  onClick={() => openModal(task)}
-                                  className={`group bg-white rounded-xl border transition-all duration-200 cursor-pointer ${
-                                    snapshot.isDragging
-                                      ? "rotate-1 shadow-2xl ring-2 ring-indigo-400 scale-[1.03] z-50"
-                                      : "shadow-sm border-slate-100 hover:shadow-md hover:-translate-y-0.5"
-                                  } ${task.done ? "opacity-60 bg-slate-50" : ""}`}
-                                >
-                                  <div className="p-3.5">
-                                    <div className="flex justify-between items-start mb-2.5">
-                                      <div>
-                                        {!task.done && (
-                                          <ScoreBadge
-                                            finalScore={task.finalScore}
-                                          />
-                                        )}
-                                      </div>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          console.log(task.finalScore);
-                                        }}
-                                        className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all p-1 rounded-lg -mt-0.5 -mr-0.5 focus:opacity-100"
-                                        title="Hapus Tugas"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-3.5 w-3.5"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2.5}
-                                            d="M6 18L18 6M6 6l12 12"
-                                          />
-                                        </svg>
-                                      </button>
-                                    </div>
-
-                                    <h4
-                                      className={`text-sm font-semibold leading-snug mb-3 ${task.done ? "line-through text-slate-400" : "text-slate-800"}`}
-                                    >
-                                      {task.title}
-                                    </h4>
-
-                                    <div className="flex flex-wrap items-center gap-1.5">
-                                      <CategoryBadge
-                                        category={task.categoryName}
-                                      />
-                                      <TimeBadge
-                                        date_deadline={task.date_deadline}
-                                      />
-                                      <StatusBadge status={task.status} />
-                                    </div>
-                                  </div>
-
-                                  {task.done && (
-                                    <div className="flex items-center border-t border-slate-100 px-3.5 py-2">
-                                      <span className="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                                        Archive
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
+                              {(provided, snapshot) =>
+                                renderTaskCard(task, provided, snapshot)
+                              }
                             </Draggable>
                           ))}
                           {provided.placeholder}
@@ -504,6 +372,15 @@ const KanbanTaskPage = () => {
           )}
         </DragDropContext>
 
+        {isModalOpen && (
+          <TaskModal
+            isEditMode={isEditMode}
+            formData={formData}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            setIsModalOpen={setIsModalOpen}
+          />
+        )}
         <ConfirmDeleteModal
           isOpen={deleteModalOpen}
           onClose={() => {

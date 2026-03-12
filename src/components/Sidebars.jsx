@@ -9,7 +9,7 @@ import { GetUrgencyTheme } from "./TaskBadge";
 
 const mainMenu = [
   { label: "Dasbor", path: "/dashboard", icon: MdOutlineSpaceDashboard },
-  { label: "Daftar Tugas", path: "/tasks", icon: BiTask, badge: 12 },
+  { label: "Daftar Tugas", path: "/tasks", icon: BiTask},
   { label: "Kalender", path: "/calendar", icon: FiClock },
   { label: "Catatan", path: "/notes", icon: HiOutlineDocumentText },
 ];

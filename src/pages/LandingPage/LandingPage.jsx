@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import WelcomeModal from "../../components/Modal/WelcomeModal";
 import HeroBg from "../../assets/HeroBG.png";
 import { GoArrowRight } from "react-icons/go";
 import {
@@ -12,9 +13,11 @@ import {
   FiCreditCard,
   FiTrendingUp,
 } from "react-icons/fi";
+import { createUser } from "../../services/userServices";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -22,6 +25,25 @@ const LandingPage = () => {
       navigate("/dashboard");
     }
   }, [navigate]);
+
+  const handleSaveUserData = async (userData) => {
+    try {
+      const user = await createUser({ name: userData.name });
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...user,
+          role: userData.role,
+        }),
+      );
+
+      setIsModalOpen(false);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Gagal membuat user:", error);
+    }
+  };
 
   const features = [
     {
@@ -102,9 +124,8 @@ const LandingPage = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar onOpenModal={() => setIsModalOpen(true)} />
 
-      {/* Herro */}
       <section className="bg-[#F5F7F8] pt-24 pb-16">
         <div className=" px-5 md:px-[80px]">
           <div className="grid md:grid-cols-2 items-center gap-12">
@@ -121,7 +142,10 @@ const LandingPage = () => {
               </p>
 
               <div className="flex flex-col md:flex-row md:items-center gap-4">
-                <button className="bg-[#007BFF] px-6 py-3 rounded-full text-white font-bold flex items-center gap-3 shadow-lg shadow-blue-200 w-fit group transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-[#007BFF] px-6 py-3 rounded-full text-white font-bold flex items-center gap-3 shadow-lg shadow-blue-500/30 w-fit group transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer"
+                >
                   Coba Sekarang
                   <span className="transition-transform duration-300 group-hover:translate-x-1">
                     <GoArrowRight />
@@ -133,14 +157,17 @@ const LandingPage = () => {
                     <img
                       className="w-12 h-12 rounded-full border-4 border-white object-cover"
                       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanlasPgQjfGGU6anray6qKVVH-ZlTqmuTHw&s"
+                      alt="User"
                     />
                     <img
                       className="w-12 h-12 rounded-full border-4 border-white object-cover"
                       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanlasPgQjfGGU6anray6qKVVH-ZlTqmuTHw&s"
+                      alt="User"
                     />
                     <img
                       className="w-12 h-12 rounded-full border-4 border-white object-cover"
                       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanlasPgQjfGGU6anray6qKVVH-ZlTqmuTHw&s"
+                      alt="User"
                     />
                   </div>
 
@@ -166,17 +193,14 @@ const LandingPage = () => {
               <h2 className="text-xl font-bold">50rb+</h2>
               <p className="text-gray-400 text-sm">Pengguna Aktif</p>
             </div>
-
             <div className="px-4 md:px-8 md:border-l border-gray-300">
               <h2 className="text-xl font-bold">1.2jt+</h2>
               <p className="text-gray-400 text-sm">Tugas Selesai</p>
             </div>
-
             <div className="px-4 md:px-8 md:border-l border-gray-300">
               <h2 className="text-xl font-bold">45%</h2>
               <p className="text-gray-400 text-sm">Kenaikan Efisiensi</p>
             </div>
-
             <div className="px-4 md:px-8 md:border-l border-gray-300">
               <h2 className="text-xl font-bold">100%</h2>
               <p className="text-gray-400 text-sm">Gratis Selamanya</p>
@@ -185,7 +209,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Detail Features */}
       <section className="bg-white pt-24 pb-16">
         <div className=" mx-auto px-5 md:px-20">
           <p className="uppercase font-bold text-[16px] text-[#007BFF]">
@@ -208,11 +231,9 @@ const LandingPage = () => {
                 >
                   {item.icon}
                 </div>
-
                 <h3 className="mt-5 text-lg font-semibold text-gray-800">
                   {item.title}
                 </h3>
-
                 <p className="mt-2 text-gray-500 text-sm leading-relaxed">
                   {item.desc}
                 </p>
@@ -221,6 +242,7 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
       <section className="bg-[#F5F7F8] pt-24 pb-16">
         <div className=" mx-auto px-5 md:px-20 text-center">
           <h1 className="text-[36px] text-black font-black leading-10 pt-[16px]">
@@ -239,25 +261,23 @@ const LandingPage = () => {
                 key={i}
                 className="relative bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition"
               >
-                {/* number */}
                 <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
                   {step.number}
                 </div>
-
                 <h3 className="mt-4 text-lg font-semibold text-gray-800">
                   {step.title}
                 </h3>
-
                 <p className="mt-2 text-gray-500 text-sm leading-relaxed">
                   {step.desc}
                 </p>
-
                 {step.content}
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      <WelcomeModal isOpen={isModalOpen} onSave={handleSaveUserData} />
     </>
   );
 };

@@ -29,7 +29,7 @@ const CalenderTaskPage = () => {
   const formattedSelectedDate = formatDateForDB(selectedDate);
 
   const tasksOnSelectedDate = useMemo(() => {
-    return tasks.filter(
+    return allRawTasks.filter(
       (t) =>
         t.date_deadline && t.date_deadline.startsWith(formattedSelectedDate),
     );
@@ -73,13 +73,13 @@ const CalenderTaskPage = () => {
             <CalendarWidget
               currentViewDate={currentViewDate}
               selectedDate={selectedDate}
-              tasks={tasks}
+              tasks={allRawTasks}
               onPrevMonth={handlePrevMonth}
               onNextMonth={handleNextMonth}
               onSelectDate={setSelectedDate}
               onGoToToday={handleGoToToday}
             />
-            <SuggestionWidget suggestedTasks={suggestedTasks} />
+            {/* <SuggestionWidget suggestedTasks={suggestedTasks} /> */}
           </div>
 
           <AgendaList

@@ -5,33 +5,24 @@ import { MONTH_NAMES, formatDateForDB } from "../../helpers/calendarUtils";
 const CalendarWidget = ({
   currentViewDate,
   selectedDate,
-  tasks = [], // Beri default array kosong jaga-jaga jika data belum siap
+  tasks = [],
   onPrevMonth,
   onNextMonth,
   onSelectDate,
-  onGoToToday, // 1. PASTIKAN MENGAMBIL PROPS INI DARI PARENT
+  onGoToToday,
 }) => {
-  // --- PERHITUNGAN TANGGAL ---
-
   const year = currentViewDate.getFullYear();
   const month = currentViewDate.getMonth();
-
-  // Total hari di bulan ini
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  // Total hari di bulan sebelumnya
   const daysInPrevMonth = new Date(year, month, 0).getDate();
-  // Hari pertama di bulan ini (0 = Minggu, 1 = Senin, dst.)
   const firstDayOfMonth = new Date(year, month, 1).getDay();
 
-  // Array untuk tanggal bulan sebelumnya (yang pudar)
   const prevMonthDays = Array.from(
     { length: firstDayOfMonth },
     (_, i) => daysInPrevMonth - firstDayOfMonth + i + 1,
   );
-  // Array untuk tanggal bulan ini
   const currentMonthDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // Array untuk sisa kotak (tanggal bulan berikutnya)
   const totalSlots = 42;
   const nextMonthDaysCount =
     totalSlots - (prevMonthDays.length + currentMonthDays.length);
@@ -52,17 +43,11 @@ const CalendarWidget = ({
     );
   };
 
-  // Palet warna otomatis untuk label tugas
-  const colorPalette = [
-    "bg-blue-100 text-blue-700",
-    "bg-purple-100 text-purple-700",
-    "bg-red-100 text-red-700",
-    "bg-green-100 text-green-700",
-    "bg-orange-100 text-orange-700",
-  ];
-
-  // 2. FUNGSI INI SUDAH DIHAPUS KARENA SUDAH DIGANTIKAN OLEH PROPS onGoToToday
-  // const handleGoToToday = () => { ... }
+  const getTaskColor = (score = 0) => {
+    if (score >= 1) return "bg-red-100 text-red-700"; 
+    if (score > 0.7) return "bg-orange-100 text-orange-700"; 
+    return "bg-blue-100 text-blue-700"; 
+  };
 
   return (
     <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 font-sans w-full">
@@ -79,7 +64,6 @@ const CalendarWidget = ({
             <FaChevronLeft size={12} />
           </button>
 
-          {/* 3. PANGGIL PROPS onGoToToday KETIKA DIKLIK */}
           <span
             onClick={onGoToToday}
             className="text-sm font-bold text-slate-700 px-2 cursor-pointer hover:text-[#007BFF]"
@@ -96,9 +80,7 @@ const CalendarWidget = ({
         </div>
       </div>
 
-      {/* KALENDER GRID */}
       <div className="p-2">
-        {/* Header Hari (MIN, SEN, SEL...) */}
         <div className="grid grid-cols-7 border-b border-slate-50">
           {["MIN", "SEN", "SEL", "RAB", "KAM", "JUM", "SAB"].map((day) => (
             <div
@@ -110,9 +92,7 @@ const CalendarWidget = ({
           ))}
         </div>
 
-        {/* Grid Tanggal */}
         <div className="grid grid-cols-7 border-l border-t border-slate-50">
-          {/* Render Tanggal Bulan Sebelumnya */}
           {prevMonthDays.map((day, i) => (
             <div
               key={`prev-${i}`}
@@ -124,24 +104,19 @@ const CalendarWidget = ({
             </div>
           ))}
 
-          {/* Render Tanggal Bulan Ini */}
           {currentMonthDays.map((day) => {
-            // Cek apakah ini tanggal yang sedang diklik user
             const isSelected =
               selectedDate.getDate() === day &&
               selectedDate.getMonth() === month &&
               selectedDate.getFullYear() === year;
 
-            // Cek Hari Ini SECARA OTOMATIS
             const today = new Date();
             const isToday =
               today.getDate() === day &&
               today.getMonth() === month &&
               today.getFullYear() === year;
 
-            // Ambil daftar tugas yang sesuai dengan tanggal ini
             const dayTasks = getTasksForDay(day);
-            // Ambil maksimal 2 tugas agar kotak tidak terlalu panjang
             const visibleTasks = dayTasks.slice(0, 2);
             const remainingTasksCount = dayTasks.length - 2;
 
@@ -159,15 +134,13 @@ const CalendarWidget = ({
                   {day}
                 </div>
 
-                {/* Indikator Garis Kuning untuk Hari Ini */}
                 {isToday && (
                   <div className="w-6 h-0.5 bg-yellow-400 rounded-full ml-1 mt-1"></div>
                 )}
 
-                {/* Render Label Tugas */}
                 <div className="mt-2 flex flex-col gap-1 w-full px-1">
                   {visibleTasks.map((task, idx) => {
-                    const colorClass = colorPalette[idx % colorPalette.length];
+                    const colorClass = getTaskColor(task.finalScore);
 
                     return (
                       <div
@@ -179,7 +152,6 @@ const CalendarWidget = ({
                     );
                   })}
 
-                  {/* Tampilkan indikator jika masih ada sisa tugas */}
                   {remainingTasksCount > 0 && (
                     <div className="text-[9px] font-bold text-slate-400 pl-1 mt-0.5">
                       +{remainingTasksCount} lagi
@@ -190,7 +162,6 @@ const CalendarWidget = ({
             );
           })}
 
-          {/* Render Tanggal Bulan Berikutnya */}
           {nextMonthDays.map((day, i) => (
             <div
               key={`next-${i}`}

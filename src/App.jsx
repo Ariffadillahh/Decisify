@@ -2,7 +2,6 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import Welcome from "./pages/Welcome/Welcome";
 import ProtectedRoute from "./ProtectedRoute";
 import { GooeyToaster } from "goey-toast";
 
@@ -18,7 +17,6 @@ const App = () => {
       <GooeyToaster position="top-right" />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/welcome" element={<Welcome />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

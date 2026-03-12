@@ -1,8 +1,10 @@
 import { db } from "./db";
 
-export const createUser = async (name) => {
+export const createUser = async (nameData) => {
+  const finalName = typeof nameData === "object" ? nameData.name : nameData;
+
   const userObject = {
-    username: name,
+    name: finalName, 
     createdAt: new Date().toISOString(),
   };
 

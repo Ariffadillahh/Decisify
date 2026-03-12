@@ -35,7 +35,7 @@ const TaskModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={() => setIsModalOpen(false)}
-          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         ></motion.div>
 
         <motion.div
@@ -43,7 +43,7 @@ const TaskModal = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-          className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]"
+          className="bg-white rounded-3xl w-full max-w-lg shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]"
         >
           <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
             <div>

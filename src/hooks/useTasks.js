@@ -11,6 +11,7 @@ import {
   getArchivedTasks,
   restoreArchivedTask,
   reopenArchivedTask,
+  updateArchivedTask,
 } from "../services/taskServices";
 
 const initialFormState = {
@@ -74,7 +75,7 @@ export const useTasks = () => {
         const diffDays = Math.ceil(
           (deadlineTime - now) / (1000 * 60 * 60 * 24),
         );
-        return diffDays <= 7 || task.finalScore > 0.7;
+        return diffDays <= 7 || task.finalScore > 0.7 || task.forceShow;
       }
       return true;
     });
@@ -286,21 +287,39 @@ export const useTasks = () => {
   const handleArchiveEditSubmit = async (e) => {
     e.preventDefault();
     try {
+      let finalCategoryId = null;
+
+      if (formData.category) {
+        const existingCat = await db.category
+          .where("name")
+          .equals(formData.category)
+          .first();
+
+        if (existingCat) {
+          finalCategoryId = existingCat.id;
+        } else {
+          finalCategoryId = await db.category.add({ name: formData.category });
+        }
+      }
+
       const payload = {
         ...formData,
+        categoryId: finalCategoryId,
         tingkat_kesulitan: parseInt(formData.tingkat_kesulitan),
         estimasi_jam: parseInt(formData.estimasi_jam),
       };
 
-      await reopenArchivedTask(formData.id, payload);
-      gooeyToast.success("Tugas diupdate dan dikembalikan ke Backlog!");
+      delete payload.category;
+
+      await updateArchivedTask(formData.id, payload);
+
+      gooeyToast.success("Tugas arsip berhasil diperbarui!");
       setIsModalOpen(false);
+
       fetchArchivedTasks();
-      fetchTasks();
-      window.dispatchEvent(new Event("tasks_updated"));
     } catch (error) {
       console.error(error);
-      gooeyToast.error("Gagal menyimpan perubahan");
+      gooeyToast.error("Gagal menyimpan perubahan.");
     }
   };
 

@@ -65,7 +65,7 @@ export const archiveOldTasks = async () => {
   let archivedCount = 0;
 
   if (doneTasks.length > 5) {
-    const extraTasks = doneTasks.slice(5); 
+    const extraTasks = doneTasks.slice(5);
     for (const task of extraTasks) {
       await db.tasks.update(task.id, { archived: true });
       archivedCount++;
@@ -127,7 +127,7 @@ export const restoreArchivedTask = async (task) => {
     ...task,
     archived: false,
     done: false,
-    status: "Todo",
+    status: "Backlog",
   };
   await updateTask(task.id, restoredTask);
   return restoredTask;
@@ -143,8 +143,23 @@ export const reopenArchivedTask = async (id, dataFromForm) => {
     finalScore: newScore,
     archived: false,
     done: false,
-    status: "Backlog",
-    completedAt: undefined,
+    status: "Done",
+  });
+
+  return await db.tasks.get(numericId);
+};
+
+export const updateArchivedTask = async (id, dataFromForm) => {
+  const numericId = Number(id);
+
+  const newScore = calculateFinalScore(dataFromForm);
+
+  const existingTask = await db.tasks.get(numericId);
+
+  await db.tasks.update(numericId, {
+    ...existingTask, 
+    ...dataFromForm,
+    finalScore: newScore, 
   });
 
   return await db.tasks.get(numericId);
