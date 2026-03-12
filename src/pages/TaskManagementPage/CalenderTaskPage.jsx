@@ -67,7 +67,7 @@ const CalenderTaskPage = () => {
 
   return (
     <TaskLayouts>
-      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col pl-4 md:pl-8 relative">
+      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col pl-4 md:pl-8 relative mb-10 md:mb-0">
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
           <div className="w-full lg:w-[60%] flex flex-col gap-6 shrink-0">
             <CalendarWidget

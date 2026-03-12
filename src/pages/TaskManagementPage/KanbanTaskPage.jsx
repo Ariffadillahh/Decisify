@@ -4,11 +4,11 @@ import { useTasks } from "../../hooks/useTasks";
 import TaskLayouts from "./TaskLayouts";
 import TaskModal from "./TaskModal";
 import { ScoreBadge, CategoryBadge } from "../../components/TaskBadge";
-import ConfirmDeleteModal from "../../components/Modal/ConfirmDeleteModal";
 
 import { FiPlus, FiCornerUpLeft } from "react-icons/fi";
 import { db } from "../../services/db";
 import { BsTrash } from "react-icons/bs";
+import ConfirmModal from "../../components/Modal/ConfirmModal";
 
 const columns = ["Backlog", "Todo", "Doing", "Done"];
 
@@ -154,19 +154,26 @@ const KanbanTaskPage = () => {
           ${task.done ? "opacity-60 bg-slate-50" : ""}
         `}
       >
-        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all z-10 bg-white/80 backdrop-blur-sm rounded-md px-1">
+        <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all z-10 backdrop-blur-sm rounded-md px-1.5 py-1 bg-white">
+          {task.done && (
+            <span className="text-[9px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center h-fit">
+              Done
+            </span>
+          )}
+
           {task.status !== "Backlog" && (
             <button
               onClick={(e) => handleMoveToBacklog(e, task)}
-              className="text-slate-400 hover:text-indigo-500 p-1"
+              className="flex items-center justify-center text-slate-400 hover:text-indigo-500 p-1 transition-colors"
               title="Kembalikan ke Backlog"
             >
               <FiCornerUpLeft size={14} />
             </button>
           )}
+
           <button
             onClick={(e) => handleDeleteClick(e, task.id)}
-            className="text-slate-400 hover:text-red-500 p-1"
+            className="flex items-center justify-center text-slate-400 hover:text-red-500 p-1 transition-colors"
             title="Hapus Tugas"
           >
             <BsTrash size={13} />
@@ -181,7 +188,7 @@ const KanbanTaskPage = () => {
 
         <div className="mb-4 pr-6">
           <h4
-            className={`text-sm md:text-[15px] font-bold text-slate-800 leading-snug tracking-tight ${task.done ? "line-through text-slate-400" : ""}`}
+            className={`text-sm md:text-[15px] truncate font-bold text-slate-800 leading-snug tracking-tight ${task.done ? "line-through text-slate-400" : ""}`}
           >
             {task.title}
           </h4>
@@ -200,14 +207,6 @@ const KanbanTaskPage = () => {
             </span>
           </div>
         </div>
-
-        {task.done && (
-          <div className="absolute bottom-4 right-4">
-            <span className="text-[9px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wider">
-              Done
-            </span>
-          </div>
-        )}
       </div>
     );
   };
@@ -381,7 +380,7 @@ const KanbanTaskPage = () => {
             setIsModalOpen={setIsModalOpen}
           />
         )}
-        <ConfirmDeleteModal
+        <ConfirmModal
           isOpen={deleteModalOpen}
           onClose={() => {
             setDeleteModalOpen(false);

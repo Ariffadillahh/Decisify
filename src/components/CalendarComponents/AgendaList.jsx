@@ -3,8 +3,8 @@ import { FiPlus, FiClock, FiArrowUpCircle } from "react-icons/fi";
 import { BsCalendarEvent, BsTrash } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { CategoryBadge, ScoreBadge } from "../TaskBadge";
-import ConfirmDeleteModal from "../Modal/ConfirmDeleteModal";
 import { db } from "../../services/db";
+import ConfirmModal from "../Modal/ConfirmModal";
 
 const AnimatedDeleteButton = ({ onClick }) => {
   return (
@@ -261,7 +261,7 @@ const AgendaList = ({
         </div>
       </div>
 
-      <ConfirmDeleteModal
+      <ConfirmModal
         isOpen={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
