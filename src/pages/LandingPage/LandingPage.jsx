@@ -45,6 +45,17 @@ const LandingPage = () => {
     }
   };
 
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   const features = [
     {
       icon: <FiBarChart2 />,
@@ -124,9 +135,12 @@ const LandingPage = () => {
 
   return (
     <>
-      <Navbar onOpenModal={() => setIsModalOpen(true)} />
+      <Navbar
+        onOpenModal={() => setIsModalOpen(true)}
+        scrollToSection={scrollToSection}
+      />
 
-      <section className="bg-[#F5F7F8] pt-24 pb-16">
+      <section id="hero" className="bg-[#F5F7F8] pt-24 pb-16">
         <div className=" px-5 md:px-[80px]">
           <div className="grid md:grid-cols-2 items-center gap-12">
             <div>
@@ -209,7 +223,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="bg-white pt-24 pb-16">
+      <section id="features" className="bg-white pt-24 pb-16">
         <div className=" mx-auto px-5 md:px-20">
           <p className="uppercase font-bold text-[16px] text-[#007BFF]">
             Kenapa Decisify?
@@ -243,7 +257,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="bg-[#F5F7F8] pt-24 pb-16">
+      <section id="workflow" className="bg-[#F5F7F8] pt-24 pb-16">
         <div className=" mx-auto px-5 md:px-20 text-center">
           <h1 className="text-[36px] text-black font-black leading-10 pt-[16px]">
             Cara Kerja Decisify
@@ -276,6 +290,70 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      <section className="px-5 md:px-[80px] py-20 bg-white">
+        <div className="max-w-6xl mx-auto rounded-[32px] px-10 py-20 text-center relative overflow-hidden bg-gradient-to-r from-[#0B1E3B] via-[#0E2A53] to-[#0B1E3B]">
+          <div className="absolute -left-40 -top-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
+          <div className="absolute -right-40 -bottom-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
+
+          <h2 className="text-white font-black text-3xl md:text-5xl leading-tight max-w-3xl mx-auto">
+            Siap Mengambil Kendali Penuh Atas Waktu Anda?
+          </h2>
+
+          <p className="text-slate-300 mt-6 max-w-xl mx-auto text-sm md:text-base">
+            Bergabunglah dengan ribuan profesional lainnya. 100% gratis, tanpa
+            kartu kredit, tanpa syarat. Mulai produktif hari ini.
+          </p>
+
+          <div className="flex flex-col md:flex-row justify-center gap-4 mt-10">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 transition-all shadow-lg shadow-blue-500/30"
+            >
+              Daftar Sekarang - Gratis
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-white">
+        <div className="w-full max-w-screen-xl mx-auto p-4 md:py-8">
+          <div className="sm:flex sm:items-center sm:justify-between">
+            <button
+              onClick={() => scrollToSection("hero")}
+              className="flex items-center space-x-3"
+            >
+              <span className="text-2xl font-semibold">Decisify</span>
+            </button>
+
+            <ul className="flex flex-wrap items-center text-sm font-medium text-gray-500">
+              <li>
+                <button
+                  onClick={() => scrollToSection("features")}
+                  className="hover:underline me-4 md:me-6"
+                >
+                  Fitur
+                </button>
+              </li>
+
+              <li>
+                <button
+                  onClick={() => scrollToSection("workflow")}
+                  className="hover:underline me-4 md:me-6"
+                >
+                  Cara Kerja
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <hr className="my-6 border-gray-200" />
+
+          <span className="block text-sm text-gray-500 text-center">
+            © 2026 Decisify. All Rights Reserved.
+          </span>
+        </div>
+      </footer>
 
       <WelcomeModal isOpen={isModalOpen} onSave={handleSaveUserData} />
     </>

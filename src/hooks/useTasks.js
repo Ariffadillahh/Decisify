@@ -32,28 +32,29 @@ export const useTasks = () => {
   const [formData, setFormData] = useState(initialFormState);
 
   const fetchTasks = useCallback(async () => {
-    // 1. Ambil SEMUA data mentah langsung dari tabel (tanpa filter apapun)
     const rawAllData = await db.tasks.toArray();
-
-    // 2. Ambil data yang difilter untuk kebutuhan Kanban board
     const data = await getAllTasks();
-
     const now = new Date().getTime();
+
     const categories = await db.category.toArray();
     const categoryMap = categories.reduce((acc, cat) => {
       acc[cat.id] = cat.name;
       return acc;
     }, {});
 
-    // --- NORMALISASI KHUSUS PROGRESS BAR (SEMUA TUGAS) ---
+    // --- PERBAIKAN 1: NORMALISASI SEMUA TUGAS (Termasuk untuk Kalender) ---
+    // Pastikan categoryName dan finalScore ikut ter-mapping agar UI AgendaList bisa membacanya
     const normalizedAll = rawAllData.map((task) => {
+      const resolvedCategoryName =
+        categoryMap[task.categoryId] || task.category || "";
       return {
         ...task,
+        categoryName: resolvedCategoryName,
+        finalScore: calculateFinalScore(task),
         status: task.status || "Backlog",
         done: task.status === "Done",
       };
     });
-    // Sekarang state ini pasti berisi full 8/8 data dari DB!
     setAllRawTasks(normalizedAll);
 
     // --- NORMALISASI KHUSUS KANBAN BOARD ---
@@ -94,7 +95,6 @@ export const useTasks = () => {
 
   useEffect(() => {
     fetchTasks();
-
     const interval = setInterval(async () => {
       await archiveOldTasks();
       fetchTasks();
@@ -109,28 +109,40 @@ export const useTasks = () => {
     };
   }, [fetchTasks]);
 
-  const openModal = (task = null) => {
+  const openModal = async (task = null) => {
     if (task) {
-      let formattedDate = task.date_deadline;
+      // 🔥 ambil data terbaru dari database
+      const freshTask = await db.tasks.get(task.id);
+
+      let formattedDate = freshTask.date_deadline;
       if (formattedDate && formattedDate.length === 10) {
         formattedDate += "T00:00";
       }
 
       setIsEditMode(true);
-      setCurrentTaskId(task.id);
+      setCurrentTaskId(freshTask.id);
+
+      // --- PERBAIKAN 2: Resolve Nama Kategori ---
+      // Karena DB hanya simpan categoryId, kita harus cari namanya dari tabel category
+      const categories = await db.category.toArray();
+      const existingCat = categories.find((c) => c.id === freshTask.categoryId);
+      const resolvedCategoryName = existingCat
+        ? existingCat.name
+        : freshTask.category || "";
 
       setFormData({
-        id: task.id,
-        title: task.title,
-        category: task.categoryName || task.category || "",
+        id: freshTask.id,
+        title: freshTask.title,
+        category: resolvedCategoryName, // Gunakan nama yang sudah di-resolve
         date_deadline: formattedDate,
-        tingkat_kesulitan: task.tingkat_kesulitan,
-        estimasi_jam: task.estimasi_jam,
+        tingkat_kesulitan: freshTask.tingkat_kesulitan,
+        estimasi_jam: freshTask.estimasi_jam,
       });
     } else {
       setIsEditMode(false);
       setFormData(initialFormState);
     }
+
     setIsModalOpen(true);
   };
 
@@ -157,40 +169,53 @@ export const useTasks = () => {
     }
 
     const payload = {
-      ...formData,
+      title: formData.title,
       categoryId: finalCategoryId,
+      date_deadline: formData.date_deadline,
       tingkat_kesulitan: parseInt(formData.tingkat_kesulitan),
       estimasi_jam: parseInt(formData.estimasi_jam),
-      completedAt: formData.status === "Done" ? Date.now() : null,
     };
 
-    delete payload.category;
+    try {
+      if (isEditMode) {
+        // Cari dari kedua sumber agar aman
+        const originalTask =
+          tasks.find((t) => t.id === currentTaskId) ||
+          allRawTasks.find((t) => t.id === currentTaskId);
 
-    if (isEditMode) {
-      const originalTask = tasks.find((t) => t.id === currentTaskId);
-      await updateTask(currentTaskId, { ...originalTask, ...payload });
-      gooeyToast.success("Tugas berhasil diubah!");
-    } else {
-      await createTask({ ...payload, status: "Backlog", done: false });
-      gooeyToast.success("Tugas baru berhasil dibuat!");
+        const updatedTask = {
+          ...originalTask,
+          ...payload,
+        };
+
+        await updateTask(currentTaskId, updatedTask);
+        gooeyToast.success("Tugas berhasil diubah!");
+      } else {
+        await createTask({
+          ...payload,
+          status: "Backlog",
+          done: false,
+        });
+        gooeyToast.success("Tugas baru berhasil dibuat!");
+      }
+
+      await fetchTasks();
+      window.dispatchEvent(new Event("tasks_updated"));
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("ERROR SAVE TASK:", error);
+      gooeyToast.error("Terjadi kesalahan saat menyimpan tugas.");
     }
-
-    setIsModalOpen(false);
-    fetchTasks();
-    window.dispatchEvent(new Event("tasks_updated"));
   };
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
-
     if (!destination) return;
-
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
-    ) {
+    )
       return;
-    }
 
     if (destination.droppableId === "Todo" && source.droppableId !== "Todo") {
       const currentTodoCount = tasks.filter((t) => t.status === "Todo").length;
@@ -236,9 +261,7 @@ export const useTasks = () => {
 
     await updateTask(updatedTask.id, updatedTask);
 
-    if (isDone) {
-      await archiveOldTasks();
-    }
+    if (isDone) await archiveOldTasks();
 
     fetchTasks();
     window.dispatchEvent(new Event("tasks_updated"));
@@ -288,13 +311,11 @@ export const useTasks = () => {
     e.preventDefault();
     try {
       let finalCategoryId = null;
-
       if (formData.category) {
         const existingCat = await db.category
           .where("name")
           .equals(formData.category)
           .first();
-
         if (existingCat) {
           finalCategoryId = existingCat.id;
         } else {
@@ -310,12 +331,10 @@ export const useTasks = () => {
       };
 
       delete payload.category;
-
       await updateArchivedTask(formData.id, payload);
 
       gooeyToast.success("Tugas arsip berhasil diperbarui!");
       setIsModalOpen(false);
-
       fetchArchivedTasks();
     } catch (error) {
       console.error(error);

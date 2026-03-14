@@ -56,17 +56,24 @@ const TaskModal = ({
       <div className="p-8 overflow-y-auto custom-scrollbar">
         <form id="task-form" onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
-              Nama Tugas
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">
+                Nama Tugas
+              </label>
+              <span className="text-[10px] text-slate-400 font-medium">
+                {formData.title?.length || 0}/15
+              </span>
+            </div>
             <input
               type="text"
               name="title"
-              placeholder="Cth: Laporan Analisis Data..."
+              placeholder="Cth: Laporan Data..."
               className="w-full p-4 bg-slate-50 border border-slate-200 hover:border-blue-200 focus:border-[#007BFF] focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-semibold text-slate-800 transition-all placeholder:font-medium placeholder:text-slate-300"
               value={formData.title || ""}
               onChange={handleChange}
               required
+              autoFocus
+              maxLength={15}
             />
           </div>
 
@@ -118,8 +125,17 @@ const TaskModal = ({
                     value={formData.category || ""}
                     onChange={handleChange}
                     required
-                    autoFocus
+                    maxLength={20}
                   />
+                  {}
+                  <span
+                    className={`absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-medium ${
+                      categories.length > 0 ? "right-20" : "right-5"
+                    }`}
+                  >
+                    {formData.category?.length || 0}/20
+                  </span>
+
                   {categories.length > 0 && (
                     <button
                       type="button"

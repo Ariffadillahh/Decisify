@@ -106,7 +106,7 @@ export const TimeBadge = ({ date_deadline }) => {
     displayDate = `${parseInt(day, 10)} ${monthNames[parseInt(month, 10) - 1]} ${year}`;
     displayTime = `${timePart.substring(0, 5)} WIB`;
   } else {
-    displayTime = ""; 
+    displayTime = "";
   }
 
   const hoverText = `Tenggat: ${displayDate} ${displayTime ? `pukul ${displayTime}` : ""}`;
@@ -136,8 +136,9 @@ export const CategoryBadge = ({ category }) => {
       textClass="text-slate-500 font-medium capitalize"
       icon={FiBook}
       title={`Kategori: ${category}`}
+      className="min-w-0 border border-gray-200"
     >
-      <span className="truncate max-w-[100px] md:max-w-[150px]">
+      <span className="truncate w-full max-w-[80px] md:max-w-[100px]">
         {category}
       </span>
     </BaseBadge>

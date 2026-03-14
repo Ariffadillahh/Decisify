@@ -45,26 +45,23 @@ const RecentNotesWidget = () => {
 const Dashboard = () => {
   return (
     <MainLayouts>
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="max-w-7xl mx-auto p-4 md:p-10 space-y-8 ">
         <header>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Selamat Belajar, Fathul! 🚀</h1>
           <p className="text-gray-500 mt-1 italic text-sm">"Inovasi mahasiswa untuk produktivitas tanpa batas."</p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Kolom Kiri: Stats atau Task Summary (Bisa kamu tambahkan) */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Kamu bisa panggil widget Task Management di sini */}
             <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-100">
               <h2 className="text-xl font-bold mb-2">Ready to focus?</h2>
               <p className="text-indigo-100 text-sm mb-6">Selesaikan tugasmu hari ini dengan sesi Pomodoro.</p>
-              <Link to={`/tasks/kanban`} className="bg-white text-indigo-600 px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-indigo-50 transition-all">
+              <Link to={`/tasks`} className="bg-white text-indigo-600 px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-indigo-50 transition-all">
                 Mulai Sesi Fokus
               </Link>
             </div>
           </div>
 
-          {/* Kolom Kanan: Recent Notes */}
           <div className="space-y-8">
             <RecentNotesWidget />
           </div>

@@ -194,18 +194,14 @@ const KanbanTaskPage = () => {
           </h4>
         </div>
 
-        <div className="flex items-center justify-between mt-auto pt-1">
-          <CategoryBadge category={task.categoryName} />
+        <CategoryBadge category={task.categoryName} />
 
-          <div className="flex items-center gap-1.5">
-            <span className={`text-[11px] font-semibold ${timeInfo.color}`}>
-              {timeInfo.text}
-            </span>
-            <span className="text-[9px] text-slate-300">•</span>
-            <span className="text-[11px] font-semibold text-slate-400">
-              {clockTime} WIB
-            </span>
-          </div>
+        <div className="flex items-center justify-between text-[11px] mt-3">
+          <span className={`font-semibold ${timeInfo.color}`}>
+            {timeInfo.text}
+          </span>
+
+          <span className="text-slate-400 font-medium">{clockTime} WIB</span>
         </div>
       </div>
     );
@@ -233,7 +229,6 @@ const KanbanTaskPage = () => {
         </div>
 
         <DragDropContext onDragEnd={onDragEnd}>
-          {/* ── MOBILE: 4 rows, each scrolls horizontally ── */}
           {isMobile && (
             <div className="flex flex-col gap-5 px-3">
               {columns.map((col) => {

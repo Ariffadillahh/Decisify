@@ -27,7 +27,7 @@ const NavbarDashboard = () => {
   ];
 
   return (
-    <nav className="relative flex items-center justify-between px-5 md:px-8 py-4 bg-white border-b border-slate-100 font-sans w-full">
+    <nav className="relative flex items-center justify-between px-5 md:px-8 py-4 bg-white border-b border-slate-100 font-sans w-full drop-shadow">
       <div className="flex items-center gap-6 md:gap-10">
         <button
           className="md:hidden text-slate-500 hover:text-slate-900"
@@ -46,12 +46,7 @@ const NavbarDashboard = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-6 text-sm font-semibold">
-          <Link to="/dashboard" className={getDesktopLinkClass("/dashboard")}>
-             Beranda
-          </Link>
-          <Link to="/archive" className={getDesktopLinkClass("/archive")}>
-            Arsip
-          </Link>
+          <p className="">Beranda</p>
         </div>
       </div>
 
@@ -61,7 +56,7 @@ const NavbarDashboard = () => {
             {user?.name || "Guest"}
           </span>
           <span className="text-[11px] text-slate-500 font-medium">
-             {user?.role || "Mahasiswa"}
+            {user?.role || "Mahasiswa"}
           </span>
         </div>
       </div>

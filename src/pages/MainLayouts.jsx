@@ -25,7 +25,7 @@ const MainLayouts = ({ children }) => {
           <Sidebars />
         </aside>
 
-        <main className="flex-1 pr-4 md:pr-0 md:py-8 md:pr-8 md:pl-2 w-full md:ml-[280px] min-h-[calc(100vh-80px)]">
+        <main className="flex-1 md:pr-0 md:py-8 md:pr-8 md:pl-2 w-full md:ml-[280px] min-h-[calc(100vh-80px)]">
           {children}
         </main>
       </div>

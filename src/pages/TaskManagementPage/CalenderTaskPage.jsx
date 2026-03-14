@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import TaskLayouts from "./TaskLayouts";
 import { useTasks } from "../../hooks/useTasks";
 
@@ -21,6 +21,7 @@ const CalenderTaskPage = () => {
     handleSubmit,
     openModal,
     allRawTasks,
+    fetchTasks, // <-- Tambahkan ini untuk memanggil ulang data
   } = useTasks();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -28,12 +29,29 @@ const CalenderTaskPage = () => {
 
   const formattedSelectedDate = formatDateForDB(selectedDate);
 
+  useEffect(() => {
+    const handleDataUpdate = () => {
+      if (fetchTasks) {
+        fetchTasks();
+      }
+    };
+
+    // Pasang telinga untuk mendengarkan event "tasks_updated"
+    window.addEventListener("tasks_updated", handleDataUpdate);
+
+    // Bersihkan event listener ketika komponen tidak lagi ditampilkan
+    return () => {
+      window.removeEventListener("tasks_updated", handleDataUpdate);
+    };
+  }, [fetchTasks]);
+  // -----------------------------------------------------
+
   const tasksOnSelectedDate = useMemo(() => {
     return allRawTasks.filter(
       (t) =>
         t.date_deadline && t.date_deadline.startsWith(formattedSelectedDate),
     );
-  }, [tasks, formattedSelectedDate]);
+  }, [tasks, formattedSelectedDate, allRawTasks]); // Tambahkan allRawTasks ke dependency array
 
   const suggestedTasks = useMemo(() => {
     return tasks
@@ -67,7 +85,7 @@ const CalenderTaskPage = () => {
 
   return (
     <TaskLayouts>
-      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col pl-4 md:pl-8 relative mb-10 md:mb-0">
+      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col px-4 py-3 md:py-0 md:pl-8 relative mb-10 md:mb-0">
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
           <div className="w-full lg:w-[60%] flex flex-col gap-6 shrink-0">
             <CalendarWidget

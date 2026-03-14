@@ -4,8 +4,7 @@ import { BiPlus, BiFolderPlus } from "react-icons/bi";
 const NotesLayout = ({ children, onCreateNote, onCreateFolder }) => {
   return (
     <MainLayouts>
-      <div className="flex flex-col h-screen bg-white">
-        {/* Navbar */}
+      <div className="flex flex-col h-screen bg-white mx-5 ml-10">
         <nav className="bg-white border-b border-gray-200 px-6 py-4 shrink-0">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-indigo-600">Notes</h1>
@@ -20,7 +19,6 @@ const NotesLayout = ({ children, onCreateNote, onCreateFolder }) => {
           </div>
         </nav>
 
-        {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden">{children}</div>
       </div>
     </MainLayouts>

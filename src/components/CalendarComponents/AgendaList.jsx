@@ -139,7 +139,7 @@ const AgendaList = ({
 
   return (
     <>
-      <div className="flex-1 w-full bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100 font-sans">
+      <div className="flex-1 w-full max-w-md bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100 font-sans">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-xl md:text-2xl font-extrabold text-slate-900">
             Jadwal & Tenggat
@@ -194,7 +194,7 @@ const AgendaList = ({
                     <div
                       key={task.id || index}
                       onClick={() => onTaskClick(task)}
-                      className={`group flex items-center justify-between pl-4 border-l-[4px] cursor-pointer hover:bg-slate-50 py-3 rounded-r-xl transition-colors ${borderColor}`}
+                      className={`group flex items-center justify-between pl-4 pr-[10px] border-l-[4px] cursor-pointer hover:bg-slate-50 py-3 rounded-r-xl transition-colors ${borderColor}`}
                     >
                       <div className="flex flex-col gap-1.5">
                         <h4 className="font-bold text-slate-900 text-base leading-none">
@@ -205,7 +205,7 @@ const AgendaList = ({
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-1">
                         <ScoreBadge finalScore={score} />
                         <CategoryBadge category={task.categoryName} />
                         {isHiddenFromKanban && (

@@ -6,12 +6,14 @@ import { FiClock } from "react-icons/fi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useTasks } from "../hooks/useTasks";
 import { GetUrgencyTheme } from "./TaskBadge";
+import { RiArchiveStackFill } from "react-icons/ri";
 
 const mainMenu = [
-  { label: "Dasbor", path: "/dashboard", icon: MdOutlineSpaceDashboard },
+  { label: "Dashboard", path: "/dashboard", icon: MdOutlineSpaceDashboard },
   { label: "Daftar Tugas", path: "/tasks", icon: BiTask},
   { label: "Kalender", path: "/calendar", icon: FiClock },
   { label: "Catatan", path: "/notes", icon: HiOutlineDocumentText },
+  { label: "Arsip", path: "/archive", icon: RiArchiveStackFill  },
 ];
 
 const Sidebar = () => {
@@ -64,7 +66,6 @@ const Sidebar = () => {
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {item.badge}
                     </span>
                   )}
                 </Link>

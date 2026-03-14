@@ -90,7 +90,7 @@ const WelcomeModal = ({ isOpen, onSave }) => {
                         className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
                           isSelected
                             ? "border-[#007BFF] bg-blue-50/50 text-[#007BFF] shadow-sm scale-105"
-                            : "border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:bg-slate-50"
+                            : "border-slate-300 bg-white text-slate-400 hover:border-slate-200 hover:bg-slate-50"
                         }`}
                       >
                         <Icon size={24} className="mb-2" />
