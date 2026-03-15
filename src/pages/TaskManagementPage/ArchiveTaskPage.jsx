@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 import TaskLayouts from "./TaskLayouts";
-// import MainLayouts from "../MainLayouts"; // Hapus jika tidak dipakai
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BsSearch,
@@ -12,6 +11,7 @@ import {
 import TaskModal from "./TaskModal";
 import { useTasks } from "../../hooks/useTasks";
 import { CategoryBadge } from "../../components/TaskBadge";
+import { RiInboxArchiveLine } from "react-icons/ri";
 
 const ArchiveTaskPage = () => {
   const {
@@ -70,9 +70,7 @@ const ArchiveTaskPage = () => {
 
   return (
     <TaskLayouts>
-      {/* 1. Perbaikan padding dan margin container agar aman di Mobile & Desktop */}
       <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col px-4 md:px-8 py-6 md:py-8">
-        {/* 2. Perbaikan Header Card padding dan ukuran teks */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100">
           <div>
             <h1 className="text-xl md:text-2xl font-black text-slate-800">
@@ -83,7 +81,6 @@ const ArchiveTaskPage = () => {
             </p>
           </div>
 
-          {/* Wrapper Filter & Search dibikin w-full di mobile */}
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <div className="relative w-full sm:w-64">
               <BsSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -110,7 +107,6 @@ const ArchiveTaskPage = () => {
           </div>
         </div>
 
-        {/* 3. Grid responsif dengan penyesuaian padding bawah untuk navigation bar mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-24 md:pb-8">
           <AnimatePresence>
             {filteredTasks.length === 0 ? (
@@ -119,7 +115,7 @@ const ArchiveTaskPage = () => {
                 animate={{ opacity: 1 }}
                 className="col-span-full flex flex-col items-center justify-center py-20 opacity-50"
               >
-                <span className="text-5xl md:text-6xl mb-4">📭</span>
+                <span className="text-5xl md:text-6xl mb-4 animate-bounce text-slate-500"><RiInboxArchiveLine /></span>
                 <h3 className="text-base md:text-lg font-bold text-slate-600">
                   Archive Kosong
                 </h3>
@@ -138,7 +134,6 @@ const ArchiveTaskPage = () => {
                   className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group relative flex flex-col"
                 >
                   <div className="flex-1">
-                    {/* Tambahan line-clamp-2 agar judul panjang tidak merusak card */}
                     <h3 className="font-bold text-slate-700 text-sm md:text-base mb-3 line-through opacity-70 line-clamp-2">
                       {task.title}
                     </h3>
@@ -159,7 +154,6 @@ const ArchiveTaskPage = () => {
                     <CategoryBadge category={task.categoryName} />
                   </div>
 
-                  {/* 4. Touch targets diperbesar sedikit untuk mobile (py-2.5 dan p-2.5) */}
                   <div className="flex items-center gap-2 pt-4 border-t border-slate-100 mt-4 md:mt-auto">
                     <button
                       onClick={() => handleRestoreTask(task)}

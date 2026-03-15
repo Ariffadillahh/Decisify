@@ -32,7 +32,7 @@ export const ScoreBadge = ({ finalScore = 0 }) => {
         bg: "bg-orange-100",
         textCol: "text-orange-600",
       };
-    return { text: "Rutin", bg: "bg-blue-100", textCol: "text-blue-600" };
+    return { text: "Mendatang", bg: "bg-blue-100", textCol: "text-blue-600" };
   };
 
   const { text, bg, textCol } = getConfig();

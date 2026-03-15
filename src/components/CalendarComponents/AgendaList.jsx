@@ -147,8 +147,9 @@ const AgendaList = ({
           <button
             className="bg-[#007BFF] hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 transition-colors shadow-sm shadow-blue-500/30 shrink-0"
             onClick={() => onTaskClick(null)}
+            title="Tambah Tugas"
           >
-            <FiPlus size={16} /> Tambah
+            <FiPlus size={16} />
           </button>
         </div>
 

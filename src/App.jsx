@@ -10,6 +10,7 @@ import KanbanTaskPage from "./pages/TaskManagementPage/KanbanTaskPage";
 import CalenderTaskPage from "./pages/TaskManagementPage/CalenderTaskPage";
 import ArchiveTaskPage from "./pages/TaskManagementPage/ArchiveTaskPage";
 import NotesPage from "./pages/Notes/NotesPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const App = () => {
   return (
@@ -17,7 +18,8 @@ const App = () => {
       <GooeyToaster position="top-right" />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-
+        <Route path="*" element={<NotFoundPage />} />
+        
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/calendar" element={<CalenderTaskPage />} />

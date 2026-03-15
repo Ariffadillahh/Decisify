@@ -5,10 +5,11 @@ import TaskLayouts from "./TaskLayouts";
 import TaskModal from "./TaskModal";
 import { ScoreBadge, CategoryBadge } from "../../components/TaskBadge";
 
-import { FiPlus, FiCornerUpLeft } from "react-icons/fi";
+import { FiPlus, FiCornerUpLeft, FiInfo } from "react-icons/fi";
 import { db } from "../../services/db";
 import { BsTrash } from "react-icons/bs";
 import ConfirmModal from "../../components/Modal/ConfirmModal";
+import { Link } from "react-router-dom";
 
 const columns = ["Backlog", "Todo", "Doing", "Done"];
 
@@ -266,7 +267,7 @@ const KanbanTaskPage = () => {
                         >
                           {colTasks.length === 0 &&
                             !snapshot.isDraggingOver && (
-                              <div className="flex items-center justify-center w-full text-slate-300 text-xs font-medium select-none border-2 border-dashed border-slate-200 rounded-[1.25rem]">
+                              <div className="flex items-center justify-center w-full text-slate-400 text-xs font-medium select-none border-2 border-dashed border-slate-300 rounded-[1.25rem]">
                                 Kosong
                               </div>
                             )}
@@ -292,7 +293,6 @@ const KanbanTaskPage = () => {
             </div>
           )}
 
-          {/* ── DESKTOP & TABLET: Grid Layout ── */}
           {!isMobile && (
             <div
               className={`grid gap-5 items-start ml-4 md:ml-10 ${isTablet ? "grid-cols-2 px-4 pb-8" : "grid-cols-4"}`}
@@ -304,9 +304,9 @@ const KanbanTaskPage = () => {
                 return (
                   <div
                     key={col}
-                    className={`flex flex-col bg-slate-50/50 rounded-3xl border border-slate-200/60 overflow-hidden ${isTablet ? "h-[450px]" : ""}`}
+                    className={`flex flex-col bg-slate-50/50 rounded-3xl border border-slate-300 overflow-hidden ${isTablet ? "h-[450px]" : ""}`}
                   >
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200/50">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-300">
                       <div className="flex items-center gap-2.5">
                         <span
                           className={`w-2.5 h-2.5 rounded-full ${accent.dot}`}
@@ -337,7 +337,7 @@ const KanbanTaskPage = () => {
                         >
                           {colTasks.length === 0 &&
                             !snapshot.isDraggingOver && (
-                              <div className="flex flex-col items-center justify-center py-10 text-slate-300 select-none">
+                              <div className="flex flex-col items-center justify-center py-10 text-slate-400 select-none">
                                 <span className="text-xs font-medium">
                                   Kosong
                                 </span>
@@ -365,6 +365,41 @@ const KanbanTaskPage = () => {
             </div>
           )}
         </DragDropContext>
+
+        <div className="w-full bg-blue-50/50 border-t border-blue-100 p-8 mt-14">
+          <div className="max-w-7xl mx-auto px-4 md:px-10">
+            <div className="flex items-center gap-2 text-[#007BFF] mb-5">
+              <FiInfo size={20} className="shrink-0" />
+              <h4 className="font-bold text-sm uppercase tracking-wider">
+                Informasi Sistem
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex gap-4">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#007BFF] mt-2 shrink-0" />
+                <p className="text-[13px] text-slate-600 leading-relaxed font-medium">
+                  Daftar tugas di{" "}
+                  <strong className="text-slate-800">Backlog</strong> hanya akan
+                  muncul otomatis mulai{" "}
+                  <strong className="text-slate-800">
+                    {" "}
+                    H-7 sebelum deadline
+                  </strong>
+                  . Anda dapat mengatur jadwal lainnya melalui menu <Link to='/calendar' className="font-bold text-black">Kalender</Link>.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#007BFF] mt-2 shrink-0" />
+                <p className="text-[13px] text-slate-600 leading-relaxed font-medium">
+                  Tugas yang telah selesai akan dipindahkan ke{" "}
+                  <Link to='/archive' className="text-black font-bold">Arsip</Link> secara
+                  otomatis setelah 24 jam atau jika daftar tugas selesai
+                  melebihi <strong className="text-slate-800"> 5 item</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {isModalOpen && (
           <TaskModal

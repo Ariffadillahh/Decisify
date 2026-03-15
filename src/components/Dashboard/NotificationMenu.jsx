@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiBell } from "react-icons/fi";
+import { ScoreBadge } from "../TaskBadge";
 
 const NotificationMenu = ({
   urgentTasks,
@@ -8,7 +9,6 @@ const NotificationMenu = ({
   setIsNotifOpen,
   navigate,
 }) => {
-
   const getBadgeConfig = (diffDays) => {
     if (diffDays < 0)
       return {
@@ -69,10 +69,10 @@ const NotificationMenu = ({
                       key={task.id}
                       onClick={() => {
                         if (task.date_deadline)
-                        //   navigate(
-                        //     `/calendar?date=${task.date_deadline.split("T")[0]}`,
-                        //   );
-                        navigate('/tasks')
+                          //   navigate(
+                          //     `/calendar?date=${task.date_deadline.split("T")[0]}`,
+                          //   );
+                          navigate("/tasks");
                         setIsNotifOpen(false);
                       }}
                       className="p-3 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer mb-1 group"
@@ -81,11 +81,14 @@ const NotificationMenu = ({
                         {task.title}
                       </p>
                       <div className="flex justify-between items-center mt-2">
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${badge.style}`}
-                        >
-                          {badge.text}
-                        </span>
+                        <div className="flex gap-1 items-center">
+                          <ScoreBadge finalScore={task.finalScore} />
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${badge.style}`}
+                          >
+                            {badge.text}
+                          </span>
+                        </div>
                         <span className="text-[11px] text-slate-400 font-semibold truncate max-w-[120px]">
                           {task.categoryName || "Tanpa Kategori"}
                         </span>
