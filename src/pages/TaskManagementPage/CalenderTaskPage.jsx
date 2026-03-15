@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
+// 1. Import useSearchParams dari react-router-dom
+import { useSearchParams } from "react-router-dom";
 import TaskLayouts from "./TaskLayouts";
 import { useTasks } from "../../hooks/useTasks";
 
@@ -10,6 +12,9 @@ import TaskModal from "./TaskModal";
 import { formatDateForDB } from "../../helpers/calendarUtils";
 
 const CalenderTaskPage = () => {
+  // 2. Inisialisasi useSearchParams
+  const [searchParams] = useSearchParams();
+
   const {
     tasks,
     handleDelete,
@@ -21,13 +26,30 @@ const CalenderTaskPage = () => {
     handleSubmit,
     openModal,
     allRawTasks,
-    fetchTasks, // <-- Tambahkan ini untuk memanggil ulang data
+    fetchTasks,
   } = useTasks();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentViewDate, setCurrentViewDate] = useState(new Date());
 
   const formattedSelectedDate = formatDateForDB(selectedDate);
+
+  // 3. Tambahkan useEffect khusus untuk membaca parameter URL
+  useEffect(() => {
+    // Ambil nilai "date" dari URL (contoh: ?date=2026-03-15)
+    const dateParam = searchParams.get("date");
+
+    if (dateParam) {
+      // Ubah string dari URL menjadi objek Date
+      const parsedDate = new Date(dateParam);
+
+      // Validasi apakah tanggalnya valid (bukan NaN)
+      if (!isNaN(parsedDate.getTime())) {
+        setSelectedDate(parsedDate); // Ubah sorotan tanggal (biru)
+        setCurrentViewDate(parsedDate); // Geser bulan kalender agar sesuai
+      }
+    }
+  }, [searchParams]); // Jalankan ulang setiap kali URL (searchParams) berubah
 
   useEffect(() => {
     const handleDataUpdate = () => {
@@ -36,22 +58,19 @@ const CalenderTaskPage = () => {
       }
     };
 
-    // Pasang telinga untuk mendengarkan event "tasks_updated"
     window.addEventListener("tasks_updated", handleDataUpdate);
 
-    // Bersihkan event listener ketika komponen tidak lagi ditampilkan
     return () => {
       window.removeEventListener("tasks_updated", handleDataUpdate);
     };
   }, [fetchTasks]);
-  // -----------------------------------------------------
 
   const tasksOnSelectedDate = useMemo(() => {
     return allRawTasks.filter(
       (t) =>
         t.date_deadline && t.date_deadline.startsWith(formattedSelectedDate),
     );
-  }, [tasks, formattedSelectedDate, allRawTasks]); // Tambahkan allRawTasks ke dependency array
+  }, [tasks, formattedSelectedDate, allRawTasks]);
 
   const suggestedTasks = useMemo(() => {
     return tasks

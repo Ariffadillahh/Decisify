@@ -52,7 +52,7 @@ const CalendarWidget = ({
   return (
     <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 font-sans w-full">
       <div className="flex justify-between items-center p-6 border-b border-slate-50">
-        <h2 className="text-2xl font-extrabold text-[#1c2331]">
+        <h2 className="text-lg md:text-2xl font-extrabold text-[#1c2331]">
           {MONTH_NAMES[month]} {year}
         </h2>
 
@@ -66,7 +66,7 @@ const CalendarWidget = ({
 
           <span
             onClick={onGoToToday}
-            className="text-sm font-bold text-slate-700 px-2 cursor-pointer hover:text-[#007BFF]"
+            className="text-xs line-clamp-1 md:text-sm font-bold text-slate-700 px-2 cursor-pointer hover:text-[#007BFF]"
           >
             Hari Ini
           </span>

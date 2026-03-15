@@ -59,26 +59,26 @@ const LandingPage = () => {
   const features = [
     {
       icon: <FiBarChart2 />,
-      title: "Analisis Cerdas AI",
-      desc: "Algoritma kami mempelajari pola kerja Anda untuk memberikan rekomendasi waktu istirahat dan jam kerja paling produktif secara otomatis.",
+      title: "Rekomendasi Tugas Cerdas",
+      desc: "Sistem secara otomatis menyusun prioritas tugas berdasarkan deadline, tingkat kesulitan, dan estimasi waktu pengerjaan.",
       color: "bg-blue-100 text-blue-600",
     },
     {
       icon: <FiZap />,
       title: "Prioritas Otomatis",
-      desc: "Sistem Eisenhower Matrix yang ditingkatkan AI untuk membantu Anda membedakan mana yang benar-benar penting dan mana yang sekadar mendesak.",
+      desc: "AI membantu menentukan prioritas dengan Eisenhower Matrix, sekaligus menyediakan rangkuman materi dan quiz interaktif untuk memperkuat pemahaman.",
       color: "bg-green-100 text-green-600",
     },
     {
       icon: <FiRefreshCw />,
-      title: "Sinkronisasi Real-time",
-      desc: "Gunakan di HP, Tablet, atau Desktop. Semua data tersinkronisasi instan dengan enkripsi end-to-end yang menjamin privasi Anda.",
+      title: "Respons Instan",
+      desc: "Menggunakan penyimpanan browser sehingga setiap perubahan data langsung diperbarui tanpa proses loading dari server.",
       color: "bg-yellow-100 text-yellow-600",
     },
     {
       icon: <FiShield />,
-      title: "Keamanan Militer",
-      desc: "Data Anda adalah aset. Kami menggunakan standar enkripsi AES-256 untuk memastikan catatan dan strategi bisnis Anda tetap rahasia.",
+      title: "Privasi Lokal",
+      desc: "Semua data disimpan langsung di browser Anda sehingga tetap privat. Pastikan menggunakan browser yang sama agar data tidak hilang atau berubah.",
       color: "bg-purple-100 text-purple-600",
     },
     {
@@ -98,8 +98,8 @@ const LandingPage = () => {
   const steps = [
     {
       number: 1,
-      title: "Input & Kategorisasi",
-      desc: "Masukkan semua ide, tugas, dan janji temu. AI akan otomatis mengelompokkannya berdasarkan konteks dan urgensi.",
+      title: "Input Tugas",
+      desc: "Masukkan semua tugas beserta deadline, tingkat kesulitan, dan estimasi waktu pengerjaan.",
       content: (
         <div className="mt-6 bg-gray-100 rounded-xl p-4 space-y-2">
           <div className="h-2 bg-gray-300 rounded w-3/4"></div>
@@ -110,8 +110,8 @@ const LandingPage = () => {
     },
     {
       number: 2,
-      title: "Optimasi Jadwal",
-      desc: "Sistem kami menyusun jadwal 'Deep Work' untuk Anda, memastikan tugas tersulit dikerjakan saat energi Anda di puncak.",
+      title: "Prioritas Otomatis",
+      desc: "Sistem menyusun prioritas tugas secara otomatis berdasarkan deadline, tingkat kesulitan, dan estimasi waktu pengerjaan.",
       content: (
         <div className="flex gap-3 mt-6">
           <div className="w-full h-10 rounded-xl bg-blue-100"></div>
@@ -122,14 +122,38 @@ const LandingPage = () => {
     },
     {
       number: 3,
-      title: "Review & Iterasi",
-      desc: "Dapatkan laporan mingguan mendalam tentang performa Anda. Temukan hambatan dan tingkatkan fokus Anda minggu demi minggu.",
+      title: "Fokus & Selesaikan",
+      desc: "Ikuti prioritas tugas, buat catatan, dan gunakan rangkuman serta quiz untuk belajar lebih efektif.",
       content: (
         <div className="mt-6 bg-green-100 text-green-700 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium w-full">
           <FiTrendingUp />
-          +24% Productivity gain this week
+          Fokus pada tugas paling prioritas
         </div>
       ),
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: "Ahmad Faris",
+      role: "Mahasiswa PNJ",
+      quote:
+        "Decisify membantu saya mengatur tugas kuliah yang sering menumpuk. Saya jadi lebih tahu mana yang harus dikerjakan lebih dulu.",
+      initial: "AF",
+    },
+    {
+      name: "Faras Iqbal Tawakal",
+      role: "Mahasiswa PNJ",
+      quote:
+        "Aplikasinya sederhana tapi sangat membantu. Saya bisa mencatat tugas dan melihat prioritasnya dengan lebih jelas.",
+      initial: "FI",
+    },
+    {
+      name: "Raka Rammada",
+      role: "Mahasiswa PNJ",
+      quote:
+        "Fitur prioritas otomatisnya membantu saya fokus mengerjakan tugas yang paling penting sebelum deadline.",
+      initial: "RM",
     },
   ];
 
@@ -160,7 +184,7 @@ const LandingPage = () => {
                   onClick={() => setIsModalOpen(true)}
                   className="bg-[#007BFF] px-6 py-3 rounded-full text-white font-bold flex items-center gap-3 shadow-lg shadow-blue-500/30 w-fit group transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer"
                 >
-                  Coba Sekarang
+                  Mulai Produktif
                   <span className="transition-transform duration-300 group-hover:translate-x-1">
                     <GoArrowRight />
                   </span>
@@ -168,26 +192,20 @@ const LandingPage = () => {
 
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-4">
-                    <img
-                      className="w-12 h-12 rounded-full border-4 border-white object-cover"
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanlasPgQjfGGU6anray6qKVVH-ZlTqmuTHw&s"
-                      alt="User"
-                    />
-                    <img
-                      className="w-12 h-12 rounded-full border-4 border-white object-cover"
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanlasPgQjfGGU6anray6qKVVH-ZlTqmuTHw&s"
-                      alt="User"
-                    />
-                    <img
-                      className="w-12 h-12 rounded-full border-4 border-white object-cover"
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanlasPgQjfGGU6anray6qKVVH-ZlTqmuTHw&s"
-                      alt="User"
-                    />
+                    <div className="w-12 h-12 rounded-full border-4 border-white bg-blue-500 text-white flex items-center justify-center font-semibold">
+                      AF
+                    </div>
+                    <div className="w-12 h-12 rounded-full border-4 border-white bg-purple-500 text-white flex items-center justify-center font-semibold">
+                      FI
+                    </div>
+                    <div className="w-12 h-12 rounded-full border-4 border-white bg-green-500 text-white flex items-center justify-center font-semibold">
+                      RM
+                    </div>
                   </div>
 
                   <p className="text-sm text-gray-600 leading-snug">
                     Bergabung dengan <br />
-                    <span className="font-bold">50rb+ profesional</span>
+                    <span className="font-bold">Mahasiswa produktif</span>
                   </p>
                 </div>
               </div>
@@ -291,7 +309,41 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="px-5 md:px-[80px] py-20 bg-white">
+      <section className="bg-white py-20" id="testimoni">
+        <div className="mx-auto px-5 md:px-20">
+          <h2 className="text-3xl font-bold mb-12">
+            Dipakai Mahasiswa untuk Mengatur Tugas Lebih Cerdas
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
+              >
+                <div className="text-yellow-400 mb-4">★★★★★</div>
+
+                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                  "{t.quote}"
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold">
+                    {t.initial}
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-gray-800">{t.name}</p>
+                    <p className="text-sm text-gray-500">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 md:px-[80px] py-20 bg-[#F5F7F8]">
         <div className="max-w-6xl mx-auto rounded-[32px] px-10 py-20 text-center relative overflow-hidden bg-gradient-to-r from-[#0B1E3B] via-[#0E2A53] to-[#0B1E3B]">
           <div className="absolute -left-40 -top-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
           <div className="absolute -right-40 -bottom-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
@@ -310,7 +362,7 @@ const LandingPage = () => {
               onClick={() => setIsModalOpen(true)}
               className="px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 transition-all shadow-lg shadow-blue-500/30"
             >
-              Daftar Sekarang - Gratis
+              Mulai Atur Tugas
             </button>
           </div>
         </div>
@@ -344,6 +396,14 @@ const LandingPage = () => {
                   Cara Kerja
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => scrollToSection("testimoni")}
+                  className="hover:underline me-4 md:me-6"
+                >
+                  Testimoni
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -355,7 +415,11 @@ const LandingPage = () => {
         </div>
       </footer>
 
-      <WelcomeModal isOpen={isModalOpen} onSave={handleSaveUserData} />
+      <WelcomeModal
+        isOpen={isModalOpen}
+        onSave={handleSaveUserData}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };

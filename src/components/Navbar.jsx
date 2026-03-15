@@ -12,7 +12,7 @@ const Navbar = ({ onOpenModal, scrollToSection }) => {
         <h1 className="text-[#0F172A] font-bold text-[20px]">Decisify</h1>
       </div>
 
-      <ul className="hidden md:flex md:items-center gap-[32px] text-[#475569] font-semibold text-[14px]">
+      <ul className="hidden md:flex md:items-center gap-[32px] text-[#475569] font-semibold text-[14px] uppercase">
         <li
           onClick={() => scrollToSection("features")}
           className="cursor-pointer hover:text-[#007BFF] transition-colors"
@@ -40,7 +40,7 @@ const Navbar = ({ onOpenModal, scrollToSection }) => {
           onClick={onOpenModal}
           className="bg-[#007BFF] px-[20px] py-2 cursor-pointer rounded-[24px] text-white shadow-lg shadow-blue-500/30 text-[14px] font-bold hover:bg-blue-600 transition-colors"
         >
-          Mulai Gratis
+          Mulai Produktif
         </button>
       </div>
     </div>
