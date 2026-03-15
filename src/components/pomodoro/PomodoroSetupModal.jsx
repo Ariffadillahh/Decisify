@@ -64,8 +64,8 @@ const PomodoroSetupModal = ({
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
             className="fixed bottom-4 right-4 left-4 md:left-auto md:bottom-24 md:right-6 z-[70] w-auto md:w-[700px] bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border border-slate-100 max-h-[85vh] overflow-y-auto hide-scrollbar flex flex-col custom-scrollbar"
           >
-            <h3 className="text-lg md:text-3xl font-black text-slate-900 mb-6 md:mb-8 tracking-tight flex items-center justify-between">
-              <span>Pomodoro Setup</span>
+            <h3 className="text-lg md:text-2xl font-black text-slate-900 mb-6 md:mb-8 tracking-tight flex items-center justify-between">
+              <span>Pengaturan Pomodoro</span>
               <MdTimer className="text-[#007BFF] md:text-4xl" size={26} />
             </h3>
 

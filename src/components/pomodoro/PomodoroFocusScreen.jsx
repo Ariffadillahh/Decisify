@@ -188,13 +188,25 @@ const PomodoroFocusScreen = ({
 
           <div className="flex flex-col items-center justify-center z-10 w-full mt-24 md:mt-0 transition-transform duration-500">
             <p
-              className={`text-sm md:text-xl uppercase tracking-[0.3em] mb-2 md:mb-4 font-light text-center transition-colors duration-1000 ${isRest ? "text-emerald-300 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]" : "opacity-80"}`}
+              className={`text-sm md:text-xl uppercase tracking-[0.3em] mb-2 md:mb-4 font-light text-center transition-colors duration-1000 ${
+                isRest
+                  ? "text-emerald-300 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]"
+                  : "opacity-80"
+              }`}
             >
-              {isRest && !isFinished
-                ? `Break and Relax - Sesi ${currentSession}/${totalSessions}`
-                : !isFinished
-                  ? `Stay Focus - Sesi ${currentSession}/${totalSessions}`
-                  : "Finish!"}
+              {isFinished ? (
+                "Selesai!"
+              ) : (
+                <>
+                  <span>
+                    {isRest ? "Istirahat dan Bersantai" : "Tetap Fokus"}
+                  </span>
+                  <br />
+                  <span>
+                    Sesi {currentSession}/{totalSessions}
+                  </span>
+                </>
+              )}
             </p>
 
             {isFinished ? (
@@ -291,7 +303,7 @@ const PomodoroFocusScreen = ({
 
             <div className="flex flex-col w-20 md:w-28 truncate">
               <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-indigo-300">
-                Now Playing
+                Sedang diputar
               </p>
               <p className="font-bold text-xs md:text-sm truncate text-white">
                 {PLAYLIST[currentSongIndex].title}

@@ -28,7 +28,7 @@ const MusicPlayerWidget = ({
 
       <div className="flex flex-col w-20 md:w-28 truncate">
         <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-indigo-300">
-          Now Playing
+          Sedang diputar
         </p>
         <p className="font-bold text-xs md:text-sm truncate text-white">
           {PLAYLIST[currentSongIndex].title}

@@ -224,7 +224,7 @@ const KanbanTaskPage = () => {
             className="flex items-center gap-2 bg-[#007BFF] hover:bg-blue-600 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-md shadow-blue-500/20 active:scale-95"
           >
             <FiPlus size={18} />
-            <span className="hidden sm:block">Create Task</span>
+            <span className="hidden sm:block">Buat Tugas</span>
           </button>
         </div>
 
