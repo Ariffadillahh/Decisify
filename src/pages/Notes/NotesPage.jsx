@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiSearch, BiNote, BiEditAlt, BiTrash, BiChevronLeft, BiText, BiTimeFive, BiBrain, BiLoaderAlt, BiCheckCircle, BiAlignLeft, BiListUl, BiExtension } from "react-icons/bi";
@@ -39,12 +39,21 @@ const NoteContentEditor = ({ activeNote, folders, allNotes, onSelectNote, update
   const debouncedTitleUpdate = useMemo(() => debounce((id, val) => updateNoteTitle(id, val), 800), [updateNoteTitle]);
 
   // Efek untuk auto-resize textarea judul agar tidak ada scrollbar internal
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
-    }
-  }, [title]);
+  useLayoutEffect(() => {
+    const adjustHeight = () => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      }
+    };
+
+    // Jalankan kalkulasi
+    adjustHeight();
+
+    // Tambahkan sedikit delay untuk memastikan font sudah ter-load (opsional tapi ampuh)
+    const timeoutId = setTimeout(adjustHeight, 0);
+    return () => clearTimeout(timeoutId);
+  }, [title, activeNote.id]);
 
   useEffect(() => {
     return () => debouncedTitleUpdate.cancel();
@@ -109,168 +118,171 @@ const NoteContentEditor = ({ activeNote, folders, allNotes, onSelectNote, update
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full bg-white relative">
-      {/* Mobile Navigation Header */}
-      <div className="md:hidden flex items-center px-4 py-2 border-b border-gray-100 bg-white">
-        <button onClick={onBack} className="flex items-center gap-1 text-indigo-600 font-bold text-xs">
-          <BiChevronLeft size={18} /> Back
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full bg-white relative overflow-hidden min-w-0">
+      {/* 1. STICKY MOBILE HEADER: Memberikan akses navigasi cepat di HP */}
+      <div className="md:hidden flex items-center justify-between px-4 py-2.5 border-b border-slate-50 bg-white/80 backdrop-blur-md sticky top-0 z-20 shrink-0">
+        <button onClick={onBack} className="flex items-center gap-1 text-indigo-600 font-bold text-xs cursor-pointer">
+          <BiChevronLeft size={20} /> Back
         </button>
-      </div>
-
-      {/* Editor Header Area */}
-      <div className="px-6 md:px-12 pt-4 md:pt-8">
-        <Breadcrumbs activeNote={activeNote} folders={folders} allNotes={allNotes} onSelectNote={onSelectNote} />
-
-        <div className="flex justify-between items-start gap-4 mb-1">
-          {/* Sisi Kiri: Judul dan Metadata */}
-          <div className="flex-1">
-            <textarea
-              ref={textareaRef}
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                debouncedTitleUpdate(activeNote.id, e.target.value);
-              }}
-              rows="1"
-              className="text-2xl md:text-4xl font-black w-full outline-none bg-transparent text-gray-900 tracking-tight resize-none leading-tight overflow-hidden placeholder:text-gray-100"
-              placeholder="Untitled Note"
-            />
-
-            <div className="flex flex-wrap items-center justify-between gap-4 mt-2 text-[12px] text-gray-400 font-medium">
-              <div className="flex gap-4 items-center">
-                <span className="flex items-center gap-1.5 font-bold">
-                  <BiTimeFive className="text-indigo-400" size={14} />
-                  {new Date(activeNote.updatedAt).toLocaleString("id-ID", { day: "numeric", month: "long" })}
-                </span>
-                <span className={`flex items-center gap-1.5 font-bold px-2 py-0.5 rounded-md transition-colors ${wordCount < 50 ? "bg-orange-50 text-orange-500" : "bg-gray-50 text-gray-400"}`}>
-                  <BiText size={14} />
-                  {wordCount} Words
-                </span>
-              </div>
-
-              {/* AI Tools Dropdown Button */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsAiMenuOpen(!isAiMenuOpen)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-bold shadow-lg shadow-indigo-100 cursor-pointer text-[10px] uppercase tracking-widest"
-                >
-                  <BiBrain size={16} /> AI Intelligence
-                </button>
-
-                <AnimatePresence>
-                  {isAiMenuOpen && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setIsAiMenuOpen(false)} />
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden z-20 p-1"
-                      >
-                        {["summary", "keypoints", "quiz"].map((type) => (
-                          <button key={type} onClick={() => handleSelectOption(type)} className="flex items-center justify-between w-full px-4 py-3 hover:bg-indigo-50 rounded-xl transition-colors group cursor-pointer">
-                            <div className="flex items-center gap-3">
-                              {type === "summary" ? <BiAlignLeft className="text-indigo-500" /> : type === "keypoints" ? <BiListUl className="text-indigo-500" /> : <BiExtension className="text-indigo-500" />}
-                              <span className="text-gray-700 font-bold capitalize">AI {type}</span>
-                            </div>
-                            <span className="text-[9px] font-black text-gray-300 group-hover:text-indigo-300 uppercase">Min {MIN_WORDS[type]}w</span>
-                          </button>
-                        ))}
-                      </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-          </div>
-
-          {/* Sisi Kanan: Tombol Hapus */}
-          <button onClick={() => onDeleteTrigger(activeNote, "note")} className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all shrink-0 mt-1" title="Hapus Catatan">
-            <BiTrash size={22} />
+        <div className="flex items-center gap-1.5">
+          <button onClick={() => setIsAiMenuOpen(true)} className="p-2 bg-indigo-50 text-indigo-600 rounded-xl cursor-pointer active:scale-90 transition-transform">
+            <BiBrain size={18} />
+          </button>
+          <button onClick={() => onDeleteTrigger(activeNote, "note")} className="p-2 bg-red-50 text-red-500 rounded-xl cursor-pointer">
+            <BiTrash size={18} />
           </button>
         </div>
-        <hr className="border-gray-50 mt-4" />
       </div>
 
-      {/* Actual Content Editor */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-10 pb-20 pt-2">
-        <NoteEditor initialContent={activeNote.content} onChange={(content) => updateNoteContent(activeNote.id, content)} />
-      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* 2. HEADER EDITOR: Ramping di mobile, Luas di desktop */}
+        <div className="px-5 md:px-12 pt-3 md:pt-8">
+          <div className="hidden md:block">
+            <Breadcrumbs activeNote={activeNote} folders={folders} allNotes={allNotes} onSelectNote={onSelectNote} />
+          </div>
 
-      {/* Metadata Footer */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-50 px-6 py-2 flex items-center justify-between text-[10px] text-gray-400 font-bold tracking-wider uppercase">
-        <span>Est. Read: {Math.ceil(wordCount / 200)} min</span>
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Offline Database Ready
+          <div className="flex justify-between items-start gap-4 mt-1 min-w-0">
+            <div className="flex-1 min-w-0">
+              <textarea
+                ref={textareaRef}
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  debouncedTitleUpdate(activeNote.id, e.target.value);
+                }}
+                rows="1"
+                className="text-2xl md:text-4xl font-black w-full outline-none bg-transparent text-slate-900 tracking-tight resize-none leading-tight overflow-hidden placeholder:text-slate-100 word-break-words"
+                placeholder="Untitled Note"
+              />
+
+              {/* Metadata Row */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mt-1.5 text-[11px] text-slate-400 font-bold uppercase tracking-wider min-w-0">
+                <div className="flex gap-4 items-center">
+                  <span className="flex items-center gap-1.5">
+                    <BiTimeFive className="text-indigo-400" size={14} />
+                    {new Date(activeNote.updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                  </span>
+                  <span className={`flex items-center gap-1.5 ${wordCount < 50 ? "text-orange-400" : ""}`}>
+                    <BiText size={14} />
+                    {wordCount} Words
+                  </span>
+                </div>
+
+                {/* AI Button (Desktop Only - Mobile pakai Header Sticky) */}
+                <div className="relative hidden md:block">
+                  <button
+                    onClick={() => setIsAiMenuOpen(!isAiMenuOpen)}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-bold shadow-lg shadow-indigo-100 cursor-pointer text-[10px] tracking-widest"
+                  >
+                    <BiBrain size={16} /> AI Intelligence
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Trash Button (Desktop Only) */}
+            <button onClick={() => onDeleteTrigger(activeNote, "note")} className="hidden md:block p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all shrink-0 mt-1 cursor-pointer">
+              <BiTrash size={22} />
+            </button>
+          </div>
+          <hr className="border-slate-50 mt-4" />
+        </div>
+
+        {/* 3. CONTENT AREA: Menghilangkan padding samping di mobile agar lega */}
+        <div className="px-4 md:px-10 pb-20 pt-2 min-w-0">
+          <NoteEditor initialContent={activeNote.content} onChange={(content) => updateNoteContent(activeNote.id, content)} />
         </div>
       </div>
 
-      {/* --- MODALS AREA --- */}
-
-      {/* 1. Custom Warning Modal */}
+      {/* 4. MODAL AI MENU (Action Sheet Style on Mobile) */}
       <AnimatePresence>
-        {showWarning && (
-          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 backdrop-blur-sm bg-gray-900/20">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-3xl p-8 shadow-2xl max-w-xs w-full text-center border-b-4 border-orange-500">
-              <div className="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BiText size={32} />
+        {isAiMenuOpen && (
+          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsAiMenuOpen(false)} />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-white w-full md:max-w-sm rounded-t-[2.5rem] md:rounded-[2rem] p-8 shadow-2xl z-10 relative overflow-hidden"
+            >
+              <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6 md:hidden" />
+              <h3 className="text-xl font-black text-slate-800 mb-1 uppercase italic tracking-tighter">AI Assistant</h3>
+              <p className="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">Pilih mode analisis cerdas</p>
+
+              <div className="grid gap-2.5">
+                {["summary", "keypoints", "quiz"].map((type) => (
+                  <button key={type} onClick={() => handleSelectOption(type)} className="flex items-center justify-between w-full p-4 hover:bg-indigo-50 bg-slate-50 rounded-2xl transition-all group cursor-pointer">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-white rounded-xl shadow-sm text-indigo-500 group-hover:scale-110 transition-transform">
+                        {type === "summary" ? <BiAlignLeft size={20} /> : type === "keypoints" ? <BiListUl size={20} /> : <BiExtension size={20} />}
+                      </div>
+                      <span className="text-slate-700 font-bold capitalize">AI {type}</span>
+                    </div>
+                    <span className="text-[9px] font-black text-slate-300 uppercase">Min {MIN_WORDS[type]}w</span>
+                  </button>
+                ))}
               </div>
-              <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Catatan Terlalu Pendek</h3>
-              <p className="text-sm text-gray-500 mt-2 leading-relaxed font-medium">
-                Kamu butuh minimal <span className="font-bold text-indigo-600">{MIN_WORDS[configType]} kata</span> untuk menggunakan fitur <span className="capitalize">{configType}</span>.
-              </p>
-              <button onClick={() => setShowWarning(false)} className="mt-6 w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all cursor-pointer">
-                Saya Mengerti
-              </button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* 2. Configuration Modal */}
+      {/* --- MODALS LAIN (Warning, Config, Loading) --- */}
       <AnimatePresence>
-        {showConfig && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-gray-900/40">
-            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-3xl p-8 shadow-2xl max-w-sm w-full relative border-t-8 border-indigo-600">
-              <h3 className="text-xl font-black text-gray-800 mb-2 uppercase italic tracking-tighter">AI Setup</h3>
-              <p className="text-sm text-gray-500 mb-8 font-medium italic">Berapa banyak hasil yang kamu inginkan?</p>
-
-              <div className="space-y-6 mb-10">
-                <div className="flex justify-between items-end">
-                  <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Jumlah {configType === "summary" ? "Paragraf" : configType === "keypoints" ? "Poin Utama" : "Soal Kuis"}</label>
-                  <span className="text-3xl font-black text-indigo-600 leading-none">{configValue}</span>
-                </div>
-                <input type="range" min="1" max="10" value={configValue} onChange={(e) => setConfigValue(e.target.value)} className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+        {/* Warning Modal */}
+        {showWarning && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/20">
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-white rounded-[2rem] p-8 shadow-2xl max-w-xs w-full text-center border-b-8 border-orange-500">
+              <div className="w-16 h-16 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 rotate-3">
+                <BiText size={32} />
               </div>
+              <h3 className="text-lg font-black text-slate-800 uppercase italic">Terlalu Pendek</h3>
+              <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed">
+                Kamu butuh minimal <span className="text-indigo-600 font-black">{MIN_WORDS[configType]} kata</span> untuk menggunakan AI {configType}.
+              </p>
+              <button onClick={() => setShowWarning(false)} className="mt-8 w-full py-3.5 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 cursor-pointer">
+                Siap, Bos!
+              </button>
+            </motion.div>
+          </div>
+        )}
 
+        {/* Config Modal */}
+        {showConfig && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-slate-900/40">
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-white rounded-[2.5rem] p-8 shadow-2xl max-w-sm w-full relative border-t-8 border-indigo-600">
+              <h3 className="text-xl font-black text-slate-800 uppercase italic">Setup Intelligence</h3>
+              <p className="text-sm text-slate-400 mt-1 font-bold">Berapa banyak output yang kamu inginkan?</p>
+              <div className="mt-10 mb-10">
+                <div className="flex justify-between items-end mb-4">
+                  <label className="text-[10px] font-black uppercase text-slate-300 tracking-[0.2em]">Jumlah {configType}</label>
+                  <span className="text-4xl font-black text-indigo-600">{configValue}</span>
+                </div>
+                <input type="range" min="1" max="10" value={configValue} onChange={(e) => setConfigValue(e.target.value)} className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+              </div>
               <div className="flex gap-3">
-                <button onClick={() => setShowConfig(false)} className="flex-1 py-3 font-bold text-gray-400 hover:bg-gray-50 rounded-xl transition-all cursor-pointer">
+                <button onClick={() => setShowConfig(false)} className="flex-1 py-4 font-bold text-slate-300 hover:text-slate-500 transition-colors">
                   Batal
                 </button>
-                <button onClick={startAiGimmick} className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:scale-[1.02] transition-all cursor-pointer">
+                <button onClick={startAiGimmick} className="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 cursor-pointer">
                   Generate
                 </button>
               </div>
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
 
-      {/* 3. Loading & Success Modal */}
-      <AnimatePresence>
+        {/* Loading Gimmick */}
         {aiLoading && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-2xl bg-indigo-950/30">
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-[40px] p-12 shadow-2xl flex flex-col items-center max-w-xs w-full text-center">
-              <div className="relative mb-8">
-                <div className="absolute inset-0 bg-indigo-100 rounded-3xl animate-ping opacity-20"></div>
-                <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center relative">
-                  {aiStatus === "loading" ? <BiLoaderAlt className="text-indigo-600 animate-spin" size={40} /> : <BiCheckCircle className="text-green-500 animate-bounce" size={40} />}
-                </div>
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-2xl bg-indigo-950/20">
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-white rounded-[3rem] p-12 shadow-2xl flex flex-col items-center max-w-xs w-full text-center">
+              <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mb-8 relative">
+                <div className="absolute inset-0 bg-indigo-200 rounded-3xl animate-ping opacity-20"></div>
+                {aiStatus === "loading" ? <BiLoaderAlt className="text-indigo-600 animate-spin" size={40} /> : <BiCheckCircle className="text-green-500 animate-bounce" size={40} />}
               </div>
-              <h3 className="text-2xl font-black text-gray-900 uppercase italic leading-none">{aiStatus === "loading" ? "Thinking..." : "Great!"}</h3>
-              <p className="text-xs text-gray-500 mt-4 font-bold tracking-tight px-4 leading-relaxed uppercase">
-                {aiStatus === "loading" ? `AI sedang meracik ${configValue} ${configType} spesial untukmu.` : `${configValue} ${configType} siap dipelajari!`}
-              </p>
+              <h3 className="text-2xl font-black text-slate-900 italic uppercase">{aiStatus === "loading" ? "Analyzing..." : "Finished!"}</h3>
+              <p className="text-[10px] text-slate-400 mt-4 font-black uppercase tracking-widest leading-loose">AI asistenmu sedang memproses materi kuliah ini</p>
             </motion.div>
           </div>
         )}
@@ -373,9 +385,20 @@ const NotesPage = () => {
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
         onConfirm={() => {
           if (confirmModal.type === "note") {
+            // 1. Jalankan fungsi hapus
             deleteNoteFromDB(confirmModal.data.id);
+
+            // 2. Navigasi kembali ke root notes
             navigate("/notes");
-          } else deleteFolderFromDB(confirmModal.data.id);
+
+            // 3. PENTING: Buka kembali sidebar agar tidak stuck di layar kosong
+            setIsSidebarOpen(true);
+
+            setConfirmModal({ ...confirmModal, isOpen: false });
+          } else {
+            deleteFolderFromDB(confirmModal.data.id);
+            setConfirmModal({ ...confirmModal, isOpen: false });
+          }
         }}
       />
     </NotesLayout>
