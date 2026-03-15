@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BiChevronRight, BiFolder, BiFile, BiPlus, BiTrash, BiEditAlt, BiFolderPlus, BiGridVertical, BiGhost, BiPalette } from "react-icons/bi";
+import { BiChevronRight, BiFolder, BiPlus, BiTrash, BiEditAlt, BiFolderPlus, BiGridVertical, BiGhost, BiPalette, BiDotsVerticalRounded } from "react-icons/bi";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 
 const colors = [
@@ -16,6 +16,7 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false); // State baru untuk mobile
   const [editValue, setEditValue] = useState(folder.name);
   const inputRef = useRef(null);
 
@@ -23,7 +24,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
   const folderNotes = notes.filter((n) => n.folderId === folder.id);
   const isEmpty = subFolders.length === 0 && folderNotes.length === 0;
 
-  // Mendapatkan class warna berdasarkan data folder
   const currentColor = colors.find((c) => c.name === folder.color) || colors[0];
 
   useEffect(() => {
@@ -41,7 +41,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
             <BiChevronRight size={18} />
           </motion.span>
 
-          {/* Ikon Folder mengikuti warna label */}
           <BiFolder className={`${currentColor.class} shrink-0`} size={18} />
 
           {isEditing ? (
@@ -62,14 +61,14 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
           )}
         </div>
 
-        <div className="hidden group-hover:flex items-center gap-0.5 shrink-0">
+        {/* --- DESKTOP ACTIONS (Hover) --- */}
+        <div className="hidden lg:group-hover:flex items-center gap-0.5 shrink-0">
           <button
             onClick={(e) => {
               e.stopPropagation();
               setShowColorPicker(!showColorPicker);
             }}
             className="p-1 cursor-pointer hover:bg-gray-200 rounded text-gray-500"
-            title="Ubah Warna"
           >
             <BiPalette size={14} />
           </button>
@@ -79,7 +78,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               onAddSubNote(folder.id);
             }}
             className="p-1 cursor-pointer hover:bg-indigo-100 rounded text-indigo-600"
-            title="Tambah Catatan"
           >
             <BiPlus size={14} />
           </button>
@@ -89,7 +87,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               onAddSubFolder(folder.id);
             }}
             className="p-1 cursor-pointer hover:bg-amber-100 rounded text-amber-600"
-            title="Tambah Folder"
           >
             <BiFolderPlus size={14} />
           </button>
@@ -99,7 +96,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               setIsEditing(true);
             }}
             className="p-1 cursor-pointer hover:bg-gray-200 rounded text-gray-500"
-            title="Rename Folder"
           >
             <BiEditAlt size={14} />
           </button>
@@ -109,22 +105,100 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               onDeleteFolder(folder);
             }}
             className="p-1 cursor-pointer hover:bg-red-50 rounded text-red-500"
-            title="Hapus Folder"
           >
             <BiTrash size={14} />
           </button>
         </div>
 
-        {/* Floating Color Picker */}
+        {/* --- MOBILE ACTIONS BUTTON (Visible on Mobile) --- */}
+        <div className="lg:hidden flex items-center">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMobileMenu(!showMobileMenu);
+            }}
+            className="p-1.5 text-gray-400 hover:text-indigo-600 active:bg-gray-200 rounded-full transition-colors"
+          >
+            <BiDotsVerticalRounded size={20} />
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        <AnimatePresence>
+          {showMobileMenu && (
+            <>
+              <div className="fixed inset-0 z-[60]" onClick={() => setShowMobileMenu(false)} />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 5 }}
+                className="absolute right-0 top-full mt-1 w-48 bg-white shadow-xl border border-gray-100 rounded-xl z-[70] p-1 overflow-hidden"
+              >
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowColorPicker(true);
+                    setShowMobileMenu(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                >
+                  <BiPalette className="text-indigo-500" /> Ubah Warna
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddSubNote(folder.id);
+                    setShowMobileMenu(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                >
+                  <BiPlus className="text-indigo-500" /> Tambah Catatan
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddSubFolder(folder.id);
+                    setShowMobileMenu(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                >
+                  <BiFolderPlus className="text-amber-500" /> Tambah Folder
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditing(true);
+                    setShowMobileMenu(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                >
+                  <BiEditAlt className="text-gray-400" /> Rename
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteFolder(folder);
+                    setShowMobileMenu(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50"
+                >
+                  <BiTrash /> Hapus Folder
+                </button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Color Picker (Tetap seperti sebelumnya) */}
         <AnimatePresence>
           {showColorPicker && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowColorPicker(false)} />
+              <div className="fixed inset-0 z-[80]" onClick={() => setShowColorPicker(false)} />
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                className="absolute right-0 top-8 bg-white shadow-xl border border-gray-100 rounded-lg p-2 flex gap-2 z-20"
+                className="absolute right-0 top-10 bg-white shadow-2xl border border-gray-100 rounded-lg p-2 flex gap-2 z-[90]"
               >
                 {colors.map((c) => (
                   <button
@@ -134,7 +208,7 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
                       onUpdateFolderColor(folder.id, c.name);
                       setShowColorPicker(false);
                     }}
-                    className={`w-4 h-4 rounded-full ${c.bg} hover:ring-2 ring-offset-1 ring-gray-300 transition-all`}
+                    className={`w-5 h-5 rounded-full ${c.bg} hover:ring-2 ring-offset-2 ring-indigo-300 transition-all`}
                   />
                 ))}
               </motion.div>
@@ -143,6 +217,7 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
         </AnimatePresence>
       </div>
 
+      {/* Subfolders & Notes Area */}
       <AnimatePresence>
         {isOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-l border-gray-200 ml-3 mt-1">
@@ -168,11 +243,12 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
                             style={{ ...provided.draggableProps.style }}
                             className={`flex items-center group mb-0.5 rounded-md transition-all ${snapshot.isDragging ? "bg-white shadow-xl ring-2 ring-indigo-500 z-[9999]" : "hover:bg-gray-100"}`}
                           >
-                            <div {...provided.dragHandleProps} className="p-1.5 text-gray-300 cursor-grab active:cursor-grabbing hover:text-indigo-500 transition-colors">
+                            {/* Drag Handle hanya tampil di Desktop atau bisa diatur sesuai kebutuhan */}
+                            <div {...provided.dragHandleProps} className="p-2 text-gray-300 cursor-grab active:cursor-grabbing hover:text-indigo-500 transition-colors">
                               <BiGridVertical size={18} />
                             </div>
-                            <button onClick={() => onSelectNote(note)} className={`flex-1 text-left py-1.5 pr-3 text-sm truncate cursor-pointer ${activeNote?.id === note.id ? "text-indigo-700 font-bold" : "text-gray-600"}`}>
-                              <span className="truncate">{note.title || "Untitled"}</span>
+                            <button onClick={() => onSelectNote(note)} className={`flex-1 text-left py-2 pr-3 text-sm truncate cursor-pointer ${activeNote?.id === note.id ? "text-indigo-700 font-bold" : "text-gray-600"}`}>
+                              <span className="truncate font-medium">{note.title || "Untitled"}</span>
                             </button>
                           </div>
                         )}
