@@ -68,7 +68,7 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               e.stopPropagation();
               setShowColorPicker(!showColorPicker);
             }}
-            className="p-1 hover:bg-gray-200 rounded text-gray-500"
+            className="p-1 cursor-pointer hover:bg-gray-200 rounded text-gray-500"
             title="Ubah Warna"
           >
             <BiPalette size={14} />
@@ -78,7 +78,8 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               e.stopPropagation();
               onAddSubNote(folder.id);
             }}
-            className="p-1 hover:bg-indigo-100 rounded text-indigo-600"
+            className="p-1 cursor-pointer hover:bg-indigo-100 rounded text-indigo-600"
+            title="Tambah Catatan"
           >
             <BiPlus size={14} />
           </button>
@@ -87,7 +88,8 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               e.stopPropagation();
               onAddSubFolder(folder.id);
             }}
-            className="p-1 hover:bg-amber-100 rounded text-amber-600"
+            className="p-1 cursor-pointer hover:bg-amber-100 rounded text-amber-600"
+            title="Tambah Folder"
           >
             <BiFolderPlus size={14} />
           </button>
@@ -96,7 +98,8 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               e.stopPropagation();
               setIsEditing(true);
             }}
-            className="p-1 hover:bg-gray-200 rounded text-gray-500"
+            className="p-1 cursor-pointer hover:bg-gray-200 rounded text-gray-500"
+            title="Rename Folder"
           >
             <BiEditAlt size={14} />
           </button>
@@ -105,7 +108,8 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
               e.stopPropagation();
               onDeleteFolder(folder);
             }}
-            className="p-1 hover:bg-red-50 rounded text-red-500"
+            className="p-1 cursor-pointer hover:bg-red-50 rounded text-red-500"
+            title="Hapus Folder"
           >
             <BiTrash size={14} />
           </button>
@@ -167,7 +171,7 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
                             <div {...provided.dragHandleProps} className="p-1.5 text-gray-300 cursor-grab active:cursor-grabbing hover:text-indigo-500 transition-colors">
                               <BiGridVertical size={18} />
                             </div>
-                            <button onClick={() => onSelectNote(note)} className={`flex-1 text-left py-1.5 pr-3 text-sm truncate ${activeNote?.id === note.id ? "text-indigo-700 font-bold" : "text-gray-600"}`}>
+                            <button onClick={() => onSelectNote(note)} className={`flex-1 text-left py-1.5 pr-3 text-sm truncate cursor-pointer ${activeNote?.id === note.id ? "text-indigo-700 font-bold" : "text-gray-600"}`}>
                               <span className="truncate">{note.title || "Untitled"}</span>
                             </button>
                           </div>
