@@ -1,16 +1,54 @@
-# React + Vite
+# 🚀 Decisify
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<img width="2816" height="1536" alt="Logo Decify" src="https://github.com/user-attachments/assets/da0fa90e-68dd-4984-a171-071361394011" />
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> **Decision Simplify** — Mengubah kebingungan menjadi keputusan yang jelas.
 
-## React Compiler
+**Decisify** adalah aplikasi manajemen tugas cerdas yang dirancang untuk membantu Anda memprioritaskan apa yang benar-benar penting. Dengan algoritma prioritas otomatis, Decisify menghilangkan kelelahan dalam mengambil keputusan (*decision fatigue*) sehingga Anda bisa langsung fokus pada eksekusi.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 💡 Filosofi
+Nama **Decisify** diambil dari gabungan kata **Decision** dan **Simplify**. 
+Banyak orang terjebak dalam tumpukan tugas tanpa tahu harus mulai dari mana. Makna dari Decisify adalah **menyederhanakan proses pengambilan keputusan**, mengubah kekacauan menjadi daftar tindakan yang logis dan terstruktur.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## ✨ Fitur Unggulan
+
+| Fitur | Deskripsi |
+| --- | --- |
+| 📊 **Rekomendasi Tugas Cerdas** | Sistem menyusun prioritas tugas berdasarkan deadline, tingkat kesulitan, dan estimasi waktu secara otomatis. |
+| ⚡ **Prioritas Otomatis** | Menggunakan prinsip *Eisenhower Matrix* yang dibantu AI untuk menentukan urgensi, lengkap dengan rangkuman materi. |
+| 🔄 **Respons Instan** | Optimasi penyimpanan browser lokal memastikan perubahan data terupdate seketika tanpa *loading* server. |
+| 🛡️ **Privasi Lokal** | Data Anda adalah milik Anda. Semua disimpan di dalam browser (IndexedDB) untuk keamanan privasi maksimal. |
+| 📱 **Dense Information UI** | Antarmuka minimal klik, maksimal informasi. Lihat semua yang Anda butuhkan dalam satu layar cerdas. |
+| 📥 **Export & Import Data** | Cadangkan tugas ke file JSON secara lokal dan pulihkan di perangkat lain kapan saja. |
+
+---
+
+## 🛠️ Cara Kerja
+
+Decisify bekerja dengan alur kerja yang sangat sederhana namun efektif:
+
+1. **Input Tugas** 📝  
+   Masukkan semua tugas Anda. Jangan lupa sertakan **deadline**, **tingkat kesulitan**, dan **estimasi waktu** pengerjaan.
+   
+2. **Prioritas Otomatis** ⚙️  
+   Sistem akan memproses data tersebut dan menyusun daftar tugas yang harus dikerjakan terlebih dahulu menggunakan logika cerdas.
+
+
+3. **Fokus & Selesaikan** ✅  
+   Ikuti urutan prioritas yang diberikan. Gunakan fitur catatan untuk detail tugas, serta manfaatkan **rangkuman otomatis** dan **quiz interaktif** untuk memperkuat pemahaman materi (terutama bagi pelajar/mahasiswa).
+
+---
+
+## 🚀 Teknologi yang Digunakan
+
+- **React.js** - Library utama untuk membangun antarmuka.
+- **IndexedDB** - Penyimpanan database lokal di browser untuk kecepatan dan privasi.
+- **Tailwind CSS** - Untuk desain UI yang bersih dan *dense*.
+- **AI Integration** - Membantu dalam pembuatan rangkuman dan kuis.
+
+---
