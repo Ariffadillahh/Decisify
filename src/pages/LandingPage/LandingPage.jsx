@@ -51,7 +51,7 @@ const LandingPage = () => {
       if (error.name === "DatabaseClosedError") {
         try {
           await db.open();
-          return handleSaveUserData(userData); 
+          return handleSaveUserData(userData);
         } catch (retryError) {
           gooeyToast.error("Koneksi database terputus. Silakan refresh.");
         }
@@ -90,9 +90,9 @@ const LandingPage = () => {
               </h1>
 
               <p className="text-[#475569] text-lg my-6 max-w-xl">
-                Platform manajemen kognitif gratis yang mengubah cara Anda
-                bekerja. Visualisasikan setiap detik, prioritaskan secara
-                cerdas, dan capai efisiensi maksimal tanpa biaya.
+                Sistem manajemen kognitif yang memvisualisasikan waktu Anda dan
+                memprioritaskan tugas secara cerdas. Efisiensi maksimal, tanpa
+                ketergantungan server, dengan 100% privasi lokal.
               </p>
 
               <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -151,7 +151,7 @@ const LandingPage = () => {
             </div>
             <div className="px-4 md:px-8 md:border-l border-gray-300">
               <h2 className="text-xl font-bold">100%</h2>
-              <p className="text-gray-400 text-sm">Gratis Selamanya</p>
+              <p className="text-gray-400 text-sm">Privasi Aman</p>
             </div>
           </div>
         </div>
@@ -165,12 +165,13 @@ const LandingPage = () => {
           <div className="absolute -right-40 -bottom-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
 
           <h2 className="text-white font-black text-3xl md:text-5xl leading-tight max-w-3xl mx-auto">
-            Siap Mengambil Kendali Penuh Atas Waktu Anda?
+            Sederhanakan Keputusan, Fokus pada Eksekusi.
           </h2>
 
           <p className="text-slate-300 mt-6 max-w-xl mx-auto text-sm md:text-base">
-            Bergabunglah dengan ribuan profesional lainnya. 100% gratis, tanpa
-            kartu kredit, tanpa syarat. Mulai produktif hari ini.
+            Ubah kebingungan menjadi keputusan yang jelas. Akses instan tanpa
+            pendaftaran, tanpa syarat, dan 100% privasi lokal. Mulai produktif
+            hari ini.
           </p>
 
           <div className="flex flex-col md:flex-row justify-center gap-4 mt-10">
@@ -183,7 +184,6 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-
       <Footer logo={logo} scrollToSection={scrollToSection} />
 
       <WelcomeModal
