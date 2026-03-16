@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from "react";
-// 1. Import useSearchParams dari react-router-dom
 import { useSearchParams } from "react-router-dom";
 import TaskLayouts from "./TaskLayouts";
 import { useTasks } from "../../hooks/useTasks";
@@ -12,7 +11,6 @@ import TaskModal from "./TaskModal";
 import { formatDateForDB } from "../../helpers/calendarUtils";
 
 const CalenderTaskPage = () => {
-  // 2. Inisialisasi useSearchParams
   const [searchParams] = useSearchParams();
 
   const {
@@ -34,22 +32,18 @@ const CalenderTaskPage = () => {
 
   const formattedSelectedDate = formatDateForDB(selectedDate);
 
-  // 3. Tambahkan useEffect khusus untuk membaca parameter URL
   useEffect(() => {
-    // Ambil nilai "date" dari URL (contoh: ?date=2026-03-15)
     const dateParam = searchParams.get("date");
 
     if (dateParam) {
-      // Ubah string dari URL menjadi objek Date
       const parsedDate = new Date(dateParam);
 
-      // Validasi apakah tanggalnya valid (bukan NaN)
       if (!isNaN(parsedDate.getTime())) {
-        setSelectedDate(parsedDate); // Ubah sorotan tanggal (biru)
-        setCurrentViewDate(parsedDate); // Geser bulan kalender agar sesuai
+        setSelectedDate(parsedDate); 
+        setCurrentViewDate(parsedDate); 
       }
     }
-  }, [searchParams]); // Jalankan ulang setiap kali URL (searchParams) berubah
+  }, [searchParams]); 
 
   useEffect(() => {
     const handleDataUpdate = () => {
@@ -104,9 +98,9 @@ const CalenderTaskPage = () => {
 
   return (
     <TaskLayouts>
-      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col px-4 py-3 md:py-0 md:pl-8 relative mb-10 md:mb-0">
-        <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
-          <div className="w-full lg:w-[60%] flex flex-col gap-6 shrink-0">
+      <div className="min-h-screen bg-[#f8fafc] w-full flex flex-col px-4 py-3 md:px-10">
+        <div className="max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row gap-8 items-start">
+          <div className="w-full lg:flex-1 shrink-0">
             <CalendarWidget
               currentViewDate={currentViewDate}
               selectedDate={selectedDate}

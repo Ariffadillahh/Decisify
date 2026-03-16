@@ -67,6 +67,7 @@ const CalendarWidget = ({
           <span
             onClick={onGoToToday}
             className="text-xs line-clamp-1 md:text-sm font-bold text-slate-700 px-2 cursor-pointer hover:text-[#007BFF]"
+            title="Kembali ke hari ini"
           >
             Hari Ini
           </span>
