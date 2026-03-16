@@ -9,7 +9,7 @@ const FolderTree = ({ folders, notes, recentNotes, activeNote, onSelectNote, onA
   const filteredNotes = uncategorizedNotes.filter((n) => n.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 space-y-6 pb-20 custom-scrollbar">
+    <div className="flex-1 overflow-y-auto px-3 space-y-6 pb-20 hide-scrollbar">
       {!searchTerm && recentNotes.length > 0 && (
         <div className="mt-2">
           <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-3 flex items-center gap-2">
