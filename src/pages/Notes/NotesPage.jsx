@@ -52,7 +52,6 @@ const NoteContentEditor = ({
   const [wordCount, setWordCount] = useState(0);
   const textareaRef = useRef(null);
 
-  // --- AI HOOK & STATES ---
   const {
     generateAi,
     loading: aiLoading,
@@ -220,8 +219,7 @@ const NoteContentEditor = ({
       animate={{ opacity: 1 }}
       className="flex flex-col h-full bg-white relative overflow-hidden min-w-0"
     >
-      {/* Mobile Topbar */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white/90 backdrop-blur-md sticky top-0 z-20 shrink-0 shadow-sm">
+      <div className="xl:hidden flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white/90 backdrop-blur-md sticky top-0 z-20 shrink-0 shadow-sm">
         <button
           onClick={onBack}
           className="flex items-center gap-1 text-indigo-600 font-bold text-sm cursor-pointer active:scale-95 transition-transform"
@@ -246,8 +244,9 @@ const NoteContentEditor = ({
 
       {/* Editor Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="px-5 md:px-12 pt-5 md:pt-10">
-          <div className="hidden md:block">
+        {/* PERBAIKAN: Ubah padding md:px-12 menjadi lg:px-12 agar di tablet tidak terlalu sempit */}
+        <div className="px-5 lg:px-12 pt-5 lg:pt-10">
+          <div className="hidden lg:block">
             <Breadcrumbs
               activeNote={activeNote}
               folders={folders}
@@ -266,10 +265,10 @@ const NoteContentEditor = ({
                   debouncedTitleUpdate(activeNote?.id, e.target.value);
                 }}
                 rows="1"
-                className="text-3xl md:text-5xl font-black w-full outline-none bg-transparent text-slate-900 tracking-tight resize-none leading-[1.1] overflow-hidden placeholder:text-slate-200 break-words block p-0 m-0 border-none min-h-0"
+                className="text-3xl lg:text-5xl font-black w-full outline-none bg-transparent text-slate-900 tracking-tight resize-none leading-[1.1] overflow-hidden placeholder:text-slate-200 break-words block p-0 m-0 border-none min-h-0"
                 placeholder="Untitled Note"
               />
-              <div className="flex flex-wrap items-center gap-4 mt-3 text-[11px] md:text-xs text-slate-400 font-bold uppercase tracking-wider min-w-0">
+              <div className="flex flex-wrap items-center gap-4 mt-3 text-[11px] lg:text-xs text-slate-400 font-bold uppercase tracking-wider min-w-0">
                 <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg">
                   <BiTimeFive className="text-indigo-400" size={16} />{" "}
                   {activeNote?.updatedAt
@@ -288,7 +287,7 @@ const NoteContentEditor = ({
                 {/* Desktop AI Button */}
                 <button
                   onClick={() => setIsAiMenuOpen(!isAiMenuOpen)}
-                  className="hidden md:flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 transition-all font-bold shadow-lg shadow-indigo-100/50 cursor-pointer ml-auto"
+                  className="hidden lg:flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 transition-all font-bold shadow-lg shadow-indigo-100/50 cursor-pointer ml-auto"
                 >
                   <BiBrain size={18} /> AI Intelligence
                 </button>
@@ -297,15 +296,15 @@ const NoteContentEditor = ({
 
             <button
               onClick={() => onDeleteTrigger(activeNote, "note")}
-              className="hidden md:flex items-center justify-center p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all shrink-0 mt-1 cursor-pointer"
+              className="hidden lg:flex items-center justify-center p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all shrink-0 mt-1 cursor-pointer"
             >
               <BiTrash size={24} />
             </button>
           </div>
-          <hr className="border-slate-100 mt-6 md:mt-8" />
+          <hr className="border-slate-100 mt-6 lg:mt-8" />
         </div>
 
-        <div className="px-5 md:px-12 pb-32 pt-4 min-w-0">
+        <div className="px-5 lg:px-12 pb-32 pt-4 min-w-0">
           <NoteEditor
             initialContent={activeNote?.content}
             onChange={(content) => updateNoteContent(activeNote?.id, content)}
@@ -314,9 +313,9 @@ const NoteContentEditor = ({
       </div>
 
       <AnimatePresence>
-        {/* MODAL: AI MENU (Bottom Sheet di Mobile, Modal Center di Desktop) */}
+        {/* MODAL: AI MENU (Bottom Sheet di Mobile/Tablet, Modal Center di Desktop) */}
         {isAiMenuOpen && (
-          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
+          <div className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center p-0 lg:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -329,9 +328,9 @@ const NoteContentEditor = ({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="bg-white w-full md:max-w-md rounded-t-[2rem] md:rounded-[2rem] p-6 md:p-8 shadow-2xl z-10 relative overflow-hidden"
+              className="bg-white w-full lg:max-w-md rounded-t-[2rem] lg:rounded-[2rem] p-6 lg:p-8 shadow-2xl z-10 relative overflow-hidden"
             >
-              <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 md:hidden" />
+              <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 lg:hidden" />
               <h3 className="text-2xl font-black text-slate-800 mb-1 uppercase italic tracking-tighter">
                 AI Assistant
               </h3>
@@ -339,7 +338,7 @@ const NoteContentEditor = ({
                 Pilih mode analisis
               </p>
 
-              <div className="grid gap-3 pb-4 md:pb-0">
+              <div className="grid gap-3 pb-4 lg:pb-0">
                 {["summary", "keypoints", "quiz"].map((type) => (
                   <button
                     key={type}
@@ -356,7 +355,7 @@ const NoteContentEditor = ({
                           <BiExtension size={22} />
                         )}
                       </div>
-                      <span className="text-slate-700 font-bold text-sm md:text-base capitalize">
+                      <span className="text-slate-700 font-bold text-sm lg:text-base capitalize">
                         AI {type}
                       </span>
                     </div>
@@ -376,13 +375,13 @@ const NoteContentEditor = ({
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="bg-white rounded-[2.5rem] p-10 md:p-12 shadow-2xl flex flex-col items-center"
+              className="bg-white rounded-[2.5rem] p-10 lg:p-12 shadow-2xl flex flex-col items-center"
             >
               <BiLoaderAlt
                 className="text-indigo-600 animate-spin mb-6"
                 size={56}
               />
-              <h3 className="text-xl md:text-2xl font-black text-slate-900 italic uppercase leading-none">
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 italic uppercase leading-none">
                 Analyzing...
               </h3>
               <p className="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest">
@@ -398,7 +397,7 @@ const NoteContentEditor = ({
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className="bg-white rounded-[2rem] p-6 md:p-8 shadow-2xl max-w-[90%] md:max-w-sm w-full relative border-t-8 border-indigo-600"
+              className="bg-white rounded-[2rem] p-6 lg:p-8 shadow-2xl max-w-[90%] lg:max-w-sm w-full relative border-t-8 border-indigo-600"
             >
               <h3 className="text-xl font-black text-slate-800 uppercase italic leading-none">
                 Setup Intelligence
@@ -444,7 +443,7 @@ const NoteContentEditor = ({
             <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
-              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-2xl max-w-[90%] md:max-w-xs w-full text-center border-b-8 border-orange-500"
+              className="bg-white rounded-[2rem] p-8 lg:p-10 shadow-2xl max-w-[90%] lg:max-w-xs w-full text-center border-b-8 border-orange-500"
             >
               <div className="w-20 h-20 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <BiText size={40} />
@@ -505,14 +504,11 @@ const NotesPage = () => {
     data: null,
   });
 
-  // 1. REAKTIF TERHADAP RESIZE WINDOW (Fix Responsiveness)
   useEffect(() => {
     const handleResize = () => {
-      // Jika layar adalah Tablet/Desktop, SELALU tampilkan sidebar
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth > 1280) {
         setIsSidebarOpen(true);
       } else {
-        // Jika layar HP dan ada catatan yang sedang dibuka, sembunyikan sidebar
         if (activeNote) {
           setIsSidebarOpen(false);
         } else {
@@ -522,19 +518,17 @@ const NotesPage = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    // Eksekusi sekali saat komponen di-mount
     handleResize();
 
     return () => window.removeEventListener("resize", handleResize);
   }, [activeNote]);
 
-  // 2. DETEKSI URL PARAMS
   useEffect(() => {
     if (noteId && notes.length > 0) {
       const target = notes.find((n) => n.id === parseInt(noteId));
       if (target) {
         setActiveNote(target);
-        if (window.innerWidth < 768) setIsSidebarOpen(false);
+        if (window.innerWidth < 1280) setIsSidebarOpen(false);
       }
     } else if (!noteId) {
       setIsSidebarOpen(true);
@@ -564,11 +558,10 @@ const NotesPage = () => {
     >
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex flex-1 h-full overflow-hidden bg-white">
-          {/* SIDEBAR - Full Width di HP, Fixed 320px di Desktop */}
           <aside
-            className={`${isSidebarOpen ? "flex w-full md:w-80" : "hidden md:flex md:w-80"} border-r border-slate-100 bg-slate-50/50 flex-col transition-all duration-300 overflow-hidden shrink-0 z-10`}
+            className={`${isSidebarOpen ? "flex w-full xl:w-70" : "hidden xl:flex xl:w-80"} border-r border-slate-100 bg-slate-50/50 flex-col transition-all duration-300 overflow-hidden shrink-0 z-10`}
           >
-            <div className="p-4 md:p-5">
+            <div className="p-4 lg:p-5">
               <div className="relative">
                 <BiSearch
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -611,9 +604,8 @@ const NotesPage = () => {
             />
           </aside>
 
-          {/* MAIN EDITOR CONTENT */}
           <main
-            className={`${!isSidebarOpen ? "flex" : "hidden md:flex"} flex-1 flex-col bg-white min-w-0 shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.05)] z-20`}
+            className={`${!isSidebarOpen ? "flex" : "hidden xl:flex"} flex-1 flex-col bg-white min-w-0 shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.05)] z-20`}
           >
             {activeNote ? (
               <NoteContentEditor
@@ -635,7 +627,7 @@ const NotesPage = () => {
                   <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
                     <BiNote size={40} className="text-indigo-400" />
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-slate-800 break-words tracking-tight">
+                  <h3 className="text-2xl lg:text-3xl font-black text-slate-800 break-words tracking-tight">
                     Ruang Coretan
                   </h3>
                   <p className="text-sm text-slate-400 mt-2 font-medium max-w-[250px] leading-relaxed">
