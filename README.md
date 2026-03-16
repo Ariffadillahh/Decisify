@@ -52,3 +52,8 @@ Decisify bekerja dengan alur kerja yang sangat sederhana namun efektif:
 - **AI Integration** - Membantu dalam pembuatan rangkuman dan kuis.
 
 ---
+
+## 🛡️ Keamanan & Privasi
+   Decisify bekerja sepenuhnya secara lokal. Tanpa sinkronisasi server, data Anda tersimpan aman di dalam browser. Gunakan fitur Export & Import data (format .json) untuk fleksibilitas akses di perangkat berbeda atau sebagai cadangan pribadi agar data Anda tidak pernah hilang.
+
+---
