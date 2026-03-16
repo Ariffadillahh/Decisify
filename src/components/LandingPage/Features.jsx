@@ -1,5 +1,12 @@
 import React from "react";
-import { FiBarChart2, FiCreditCard, FiLayers, FiRefreshCw, FiShield, FiZap } from "react-icons/fi";
+import {
+  FiBarChart2,
+  FiDownloadCloud,
+  FiLayers,
+  FiRefreshCw,
+  FiShield,
+  FiZap,
+} from "react-icons/fi";
 
 const Features = () => {
   const features = [
@@ -34,10 +41,10 @@ const Features = () => {
       color: "bg-red-100 text-red-600",
     },
     {
-      icon: <FiCreditCard />,
-      title: "100% Gratis",
-      desc: "Tanpa biaya langganan, tanpa iklan yang mengganggu. Decisify dibangun sebagai alat bantu produktivitas murni untuk semua orang.",
-      color: "bg-blue-100 text-blue-600",
+      icon: <FiDownloadCloud />,
+      title: "Export & Import Data",
+      desc: "Kebebasan penuh atas data Anda. Cadangkan semua tugas dan catatan ke file JSON secara lokal dan pulihkan kapan saja di perangkat lain.",
+      color: "bg-indigo-100 text-indigo-600",
     },
   ];
   return (
