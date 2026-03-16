@@ -164,6 +164,6 @@ export const GetUrgencyTheme = (score = 0) => {
     dot: "bg-[#007BFF] shadow-blue-500/50",
     tooltip: "bg-slate-800",
     arrow: "border-r-slate-800",
-    label: "Rutin",
+    label: "Mendatang",
   };
 };

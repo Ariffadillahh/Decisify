@@ -10,6 +10,8 @@ import Testimoni from "../../components/LandingPage/Testimoni";
 import Steps from "../../components/LandingPage/Steps";
 import Features from "../../components/LandingPage/Features";
 import Navbar from "../../components/LandingPage/Navbar";
+import { gooeyToast } from "goey-toast";
+import { db } from "../../services/db";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -24,6 +26,10 @@ const LandingPage = () => {
 
   const handleSaveUserData = async (userData) => {
     try {
+      if (!db.isOpen()) {
+        await db.open();
+      }
+
       const user = await createUser({ name: userData.name });
 
       localStorage.setItem(
@@ -35,9 +41,23 @@ const LandingPage = () => {
       );
 
       setIsModalOpen(false);
+
+      gooeyToast.success("Selamat datang, " + userData.name + "!");
+
       navigate("/dashboard");
     } catch (error) {
       console.error("Gagal membuat user:", error);
+
+      if (error.name === "DatabaseClosedError") {
+        try {
+          await db.open();
+          return handleSaveUserData(userData); 
+        } catch (retryError) {
+          gooeyToast.error("Koneksi database terputus. Silakan refresh.");
+        }
+      } else {
+        gooeyToast.error("Terjadi kesalahan: " + error.message);
+      }
     }
   };
 

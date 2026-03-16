@@ -6,6 +6,8 @@ export const useAiAssistant = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_AI;
+
   const generateAi = async (type, notesContent, length) => {
     setLoading(true);
     setError(null);
@@ -13,7 +15,7 @@ export const useAiAssistant = () => {
 
     try {
       // Pastikan backend kamu jalan di 3000
-      const endpoint = `https://api.fbariaja.my.id/api/ai/${type}`;
+      const endpoint = `${API_URL}/ai/${type}`;
 
       const response = await axios.post(endpoint, {
         notes: notesContent,
@@ -23,7 +25,8 @@ export const useAiAssistant = () => {
       setResult({ type, data: response.data });
       return { success: true, data: response.data };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Gagal menghubungi AI Server.";
+      const errorMessage =
+        err.response?.data?.message || "Gagal menghubungi AI Server.";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

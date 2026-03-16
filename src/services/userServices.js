@@ -4,9 +4,11 @@ export const createUser = async (nameData) => {
   const finalName = typeof nameData === "object" ? nameData.name : nameData;
 
   const userObject = {
-    name: finalName, 
+    name: finalName,
     createdAt: new Date().toISOString(),
   };
+
+  await db.users.clear();
 
   const id = await db.users.add(userObject);
 
