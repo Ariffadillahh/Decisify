@@ -11,7 +11,9 @@ import { useNotes } from "../../hooks/useNotes";
 
 import DesktopSearch from "./DesktopSearch";
 import NotificationMenu from "./NotificationMenu";
-import MobileMenu from "./MobileMenu"; 
+import MobileMenu from "./MobileMenu";
+
+import logo from "../../assets/images/logo.png";
 
 const MENU_ITEMS = [
   { label: "Dashboard", path: "/dashboard", icon: MdOutlineSpaceDashboard },
@@ -85,8 +87,8 @@ const NavbarDashboard = () => {
           {isMobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
         </button>
         <div className="flex items-center gap-2 cursor-pointer">
-          <div className="bg-[#007BFF] p-1.5 rounded-lg text-white">
-            <MdOutlineSpaceDashboard size={20} />
+          <div className="p-1 rounded-lg text-white">
+            <img src={logo} alt="logo" className="w-9" />
           </div>
           <span className="text-xl font-extrabold text-slate-900 tracking-tight hidden sm:block">
             Decisify
@@ -121,12 +123,12 @@ const NavbarDashboard = () => {
 
         <div className="hidden md:block h-8 w-[1px] bg-slate-200 rounded-full"></div>
 
-        <div className="flex items-center gap-2 md:gap-3 cursor-pointer group">
+        <div className="flex items-center gap-4 md:gap-3 group">
           <div className="flex flex-col items-end">
             <span className="text-sm font-bold text-slate-900 leading-tight">
               {user?.name || "Guest"}
             </span>
-            <span className="text-[11px] text-slate-500 font-medium hidden sm:block">
+            <span className="text-[11px] text-slate-500 font-medium">
               {user?.role || "Mahasiswa"}
             </span>
           </div>

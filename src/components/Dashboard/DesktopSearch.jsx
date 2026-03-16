@@ -19,7 +19,7 @@ const DesktopSearch = ({
       <FiSearch size={18} className="text-slate-400 min-w-[18px]" />
       <input
         type="text"
-        placeholder="Search tugas atau catatan..."
+        placeholder="Cari tugas atau catatan..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="bg-transparent border-none outline-none text-[13px] font-medium text-slate-700 ml-2.5 w-full placeholder:text-slate-400 placeholder:font-medium"

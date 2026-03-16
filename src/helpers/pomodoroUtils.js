@@ -1,5 +1,5 @@
-import sakuraImg from "../assets/sakura.jpg";
-import tokyoImg from "../assets/tokyo.jpg";
+import sakuraImg from "../assets/images/sakura.jpg";
+import tokyoImg from "../assets/images/tokyo.jpg";
 import nightChill from "../assets/sfx/night-chill.mp3";
 import winterCity from "../assets/sfx/winter-city.mp3";
 import winterWalk from "../assets/sfx/winter-walk.mp3";

@@ -62,7 +62,7 @@ const Sidebar = () => {
         <h3 className="text-[11px] font-bold text-slate-400 mb-4 tracking-wider uppercase">Suggestion Focus</h3>
 
         {suggestedTasks.length === 0 ? (
-          <div className="px-5 text-slate-400 text-xs font-medium">Belum ada tugas saat ini.</div>
+          <div className=" text-slate-400 text-xs font-medium">Belum ada tugas saat ini.</div>
         ) : (
           <ul className="flex flex-col gap-5 px-5 mt-2">
             {suggestedTasks.map((task, index) => {

@@ -588,9 +588,9 @@ const NotesPage = () => {
                 onBack={() => setIsSidebarOpen(true)}
               />
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+              <div className="h-full flex flex-col items-center justify-center text-slate-700 p-8 text-center">
                 <BiNote size={40} className="opacity-20 mb-4" />
-                <h3 className="text-xl font-bold text-gray-800">Ready to study?</h3>
+                <h3 className="text-xl font-black text-slate-900">Siap Untuk Belajar?</h3>
               </div>
             )}
           </main>
