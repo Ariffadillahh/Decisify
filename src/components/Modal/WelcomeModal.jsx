@@ -27,7 +27,6 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
     }
   };
 
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -59,7 +58,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
                 <FiUser size={32} />
               </div>
               <h2 className="text-2xl font-black text-slate-900 mb-2">
-                Selamat Datang! 👋
+                Selamat Datang!
               </h2>
               <p className="text-slate-500 text-sm font-medium px-4">
                 Mari kita kenalan dulu. Silakan isi nama dan status Anda saat
