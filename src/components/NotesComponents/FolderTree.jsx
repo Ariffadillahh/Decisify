@@ -84,7 +84,6 @@ const FolderTree = ({ folders, notes, recentNotes, activeNote, onSelectNote, onA
                   </Draggable>
                 ))
               ) : (
-                /* EMPTY STATE UNTUK UNCATEGORIZED */
                 <div className="flex-1 flex flex-col items-center justify-center py-6 opacity-20 border-2 border-dashed border-gray-200 rounded-xl m-1">
                   <BiLayer size={32} className="mb-2" />
                   <p className="text-[10px] font-bold uppercase tracking-wider text-center px-4">Semua catatan sudah rapi di dalam folder</p>

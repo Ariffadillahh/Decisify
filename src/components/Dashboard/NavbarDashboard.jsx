@@ -7,7 +7,6 @@ import {
   FiClock,
   FiChevronDown,
   FiLogOut,
-  FiUser,
 } from "react-icons/fi";
 import { BiTask } from "react-icons/bi";
 import { HiOutlineDocumentText } from "react-icons/hi";
@@ -16,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useTasks } from "../../hooks/useTasks";
 import { useNotes } from "../../hooks/useNotes";
-import { db } from "../../services/db"; // Import dexie instance
+import { db } from "../../services/db"; 
 
 import DesktopSearch from "./DesktopSearch";
 import NotificationMenu from "./NotificationMenu";

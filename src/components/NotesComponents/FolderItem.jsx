@@ -16,7 +16,7 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false); // State baru untuk mobile
+  const [showMobileMenu, setShowMobileMenu] = useState(false); 
   const [editValue, setEditValue] = useState(folder.name);
   const inputRef = useRef(null);
 
@@ -61,7 +61,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
           )}
         </div>
 
-        {/* --- DESKTOP ACTIONS (Hover) --- */}
         <div className="hidden lg:group-hover:flex items-center gap-0.5 shrink-0">
           <button
             onClick={(e) => {
@@ -110,7 +109,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
           </button>
         </div>
 
-        {/* --- MOBILE ACTIONS BUTTON (Visible on Mobile) --- */}
         <div className="lg:hidden flex items-center">
           <button
             onClick={(e) => {
@@ -123,7 +121,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
           </button>
         </div>
 
-        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {showMobileMenu && (
             <>
@@ -189,7 +186,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
           )}
         </AnimatePresence>
 
-        {/* Color Picker (Tetap seperti sebelumnya) */}
         <AnimatePresence>
           {showColorPicker && (
             <>
@@ -217,7 +213,6 @@ const FolderItem = ({ folder, allFolders, notes, activeNote, onSelectNote, onAdd
         </AnimatePresence>
       </div>
 
-      {/* Subfolders & Notes Area */}
       <AnimatePresence>
         {isOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-l border-gray-200 ml-3 mt-1">

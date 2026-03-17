@@ -4,7 +4,6 @@ import TaskLayouts from "./TaskLayouts";
 import { useTasks } from "../../hooks/useTasks";
 
 import CalendarWidget from "../../components/CalendarComponents/CalendarWidget";
-import SuggestionWidget from "../../components/CalendarComponents/SuggestionWidget";
 import AgendaList from "../../components/CalendarComponents/AgendaList";
 import TaskModal from "./TaskModal";
 
@@ -66,13 +65,6 @@ const CalenderTaskPage = () => {
     );
   }, [tasks, formattedSelectedDate, allRawTasks]);
 
-  const suggestedTasks = useMemo(() => {
-    return tasks
-      .filter((t) => !t.done && t.status !== "Done")
-      .sort((a, b) => b.finalScore - a.finalScore)
-      .slice(0, 3);
-  }, [tasks]);
-
   const handlePrevMonth = () =>
     setCurrentViewDate(
       new Date(
@@ -110,7 +102,6 @@ const CalenderTaskPage = () => {
               onSelectDate={setSelectedDate}
               onGoToToday={handleGoToToday}
             />
-            {/* <SuggestionWidget suggestedTasks={suggestedTasks} /> */}
           </div>
 
           <AgendaList

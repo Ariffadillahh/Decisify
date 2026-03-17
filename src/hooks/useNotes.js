@@ -33,7 +33,6 @@ export const useNotes = () => {
   };
 
   const moveNoteToFolder = async (noteId, folderId) => {
-    // folderId bisa berupa string "uncategorized" (null) atau ID folder
     const targetFolderId = folderId === "uncategorized" ? null : parseInt(folderId);
     await db.notes.update(parseInt(noteId), { folderId: targetFolderId, updatedAt: new Date() });
   };
@@ -65,7 +64,7 @@ export const useNotes = () => {
     updateFolderTitle,
     deleteFolderFromDB,
     addNote,
-    moveNoteToFolder, // Fungsi baru
+    moveNoteToFolder, 
     updateNoteContent,
     updateNoteTitle,
     deleteNoteFromDB,

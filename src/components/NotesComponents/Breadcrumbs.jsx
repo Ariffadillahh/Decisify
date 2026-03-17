@@ -5,7 +5,7 @@ import { BiChevronRight, BiFolder, BiHomeAlt, BiFile } from "react-icons/bi";
 
 const Breadcrumbs = ({ activeNote, folders, allNotes, onSelectNote }) => {
   const navigate = useNavigate();
-  const [openDropdown, setOpenDropdown] = useState(null); // Menyimpan ID folder yang dropdown-nya terbuka
+  const [openDropdown, setOpenDropdown] = useState(null); 
 
   const getPath = () => {
     const path = [];
@@ -45,7 +45,6 @@ const Breadcrumbs = ({ activeNote, folders, allNotes, onSelectNote }) => {
                 <span>{folder.name}</span>
               </button>
 
-              {/* Dropdown Catatan dalam Folder ini */}
               <AnimatePresence>
                 {isOpen && (
                   <>

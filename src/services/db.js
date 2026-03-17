@@ -9,7 +9,7 @@ db.version(DB_VERSION).stores({
   users: "++id",
   category: "++id, name",
   tasks: "++id, userId, categoryId",
-  folders: "++id, name, parentId", // parentId null berarti folder root
+  folders: "++id, name, parentId", 
   notes: "++id, title, folderId, content, updatedAt",
   focus_sessions: "++id",
 });

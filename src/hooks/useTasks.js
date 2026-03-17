@@ -10,7 +10,6 @@ import {
   calculateFinalScore,
   getArchivedTasks,
   restoreArchivedTask,
-  reopenArchivedTask,
   updateArchivedTask,
 } from "../services/taskServices";
 
@@ -42,8 +41,6 @@ export const useTasks = () => {
       return acc;
     }, {});
 
-    // --- PERBAIKAN 1: NORMALISASI SEMUA TUGAS (Termasuk untuk Kalender) ---
-    // Pastikan categoryName dan finalScore ikut ter-mapping agar UI AgendaList bisa membacanya
     const normalizedAll = rawAllData.map((task) => {
       const resolvedCategoryName =
         categoryMap[task.categoryId] || task.category || "";
@@ -57,7 +54,6 @@ export const useTasks = () => {
     });
     setAllRawTasks(normalizedAll);
 
-    // --- NORMALISASI KHUSUS KANBAN BOARD ---
     const normalized = data.map((task) => {
       const resolvedCategoryName =
         categoryMap[task.categoryId] || task.category || "";
@@ -111,7 +107,6 @@ export const useTasks = () => {
 
   const openModal = async (task = null) => {
     if (task) {
-      // 🔥 ambil data terbaru dari database
       const freshTask = await db.tasks.get(task.id);
 
       let formattedDate = freshTask.date_deadline;
@@ -122,8 +117,6 @@ export const useTasks = () => {
       setIsEditMode(true);
       setCurrentTaskId(freshTask.id);
 
-      // --- PERBAIKAN 2: Resolve Nama Kategori ---
-      // Karena DB hanya simpan categoryId, kita harus cari namanya dari tabel category
       const categories = await db.category.toArray();
       const existingCat = categories.find((c) => c.id === freshTask.categoryId);
       const resolvedCategoryName = existingCat
@@ -133,7 +126,7 @@ export const useTasks = () => {
       setFormData({
         id: freshTask.id,
         title: freshTask.title,
-        category: resolvedCategoryName, // Gunakan nama yang sudah di-resolve
+        category: resolvedCategoryName, 
         date_deadline: formattedDate,
         tingkat_kesulitan: freshTask.tingkat_kesulitan,
         estimasi_jam: freshTask.estimasi_jam,
@@ -178,7 +171,6 @@ export const useTasks = () => {
 
     try {
       if (isEditMode) {
-        // Cari dari kedua sumber agar aman
         const originalTask =
           tasks.find((t) => t.id === currentTaskId) ||
           allRawTasks.find((t) => t.id === currentTaskId);

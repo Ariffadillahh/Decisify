@@ -68,11 +68,7 @@ const NotificationMenu = ({
                     <div
                       key={task.id}
                       onClick={() => {
-                        if (task.date_deadline)
-                          //   navigate(
-                          //     `/calendar?date=${task.date_deadline.split("T")[0]}`,
-                          //   );
-                          navigate("/tasks");
+                        if (task.date_deadline) navigate("/tasks");
                         setIsNotifOpen(false);
                       }}
                       className="p-3 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer mb-1 group"

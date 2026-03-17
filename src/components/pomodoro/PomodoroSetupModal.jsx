@@ -96,7 +96,6 @@ const PomodoroSetupModal = ({
                 <div className="overflow-y-auto space-y-2 p-1.5 max-h-[200px] md:max-h-[300px] custom-scrollbar border border-slate-100 rounded-2xl bg-slate-50/50 flex-1">
                   {availableTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full p-6 text-center opacity-70">
-                      {/* Tambahan Icon agar Empty State tidak membosankan */}
                       <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm border border-slate-100">
                         <svg
                           className="w-6 h-6 text-slate-300"

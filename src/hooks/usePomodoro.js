@@ -58,26 +58,19 @@ export const usePomodoro = () => {
       }, 1000);
     } else if (timeLeft === 0 && isFocusMode && !isFinished) {
       if (!isRest) {
-        // WAKTU FOKUS HABIS!
 
-        // 1. Tambahkan durasi sesi ini ke akumulasi total SET
         setAccumulatedFocusTime((prev) => prev + focusDuration * 60);
 
         if (currentSession < totalSessions) {
-          // Lanjut ke Istirahat
           setIsRest(true);
           setTimeLeft(breakDuration * 60);
         } else {
-          // Selesai 1 FULL SET
           setIsFinished(true);
-          // Karena sudah 1 full set (semua sesi selesai), langsung simpan rekornya
-          // Note: Karena setState (setAccumulatedFocusTime) bersifat async, kita hitung manual untuk dikirim
           const finalTotalSetTime = accumulatedFocusTime + focusDuration * 60;
           addFocusSession(finalTotalSetTime, "completed");
-          setAccumulatedFocusTime(0); // Reset untuk set berikutnya
+          setAccumulatedFocusTime(0); 
         }
       } else {
-        // Waktu Istirahat habis, kembali ke Fokus
         setIsRest(false);
         setCurrentSession((prev) => prev + 1);
         setTimeLeft(focusDuration * 60);

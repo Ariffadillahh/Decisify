@@ -30,21 +30,18 @@ const NotesLayout = ({ children, onCreateNote, onCreateFolder }) => {
                 className="flex items-center justify-center gap-2 bg-[#007BFF] hover:bg-blue-600 text-white px-4 lg:px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 transition-all"
               >
                 <BsPlusLg size={14} />
-                {/* Sembunyikan teks di tablet agar muat, tampilkan di laptop (lg) */}
                 <span className="hidden lg:block">Catatan Baru</span>
               </button>
             </div>
           </div>
         </header>
 
-        {/* CONTENT AREA: Perbaikan container flex agar children tidak offside */}
         <div className="flex flex-1 overflow-hidden px-0 md:px-4 lg:px-8 pb-0 md:pb-4 w-full min-w-0">
           <div className="flex-1 flex w-full bg-white rounded-none md:rounded-2xl lg:rounded-3xl border-none md:border border-slate-100 shadow-none md:shadow-sm overflow-hidden relative min-w-0">
             {children}
           </div>
         </div>
 
-        {/* MOBILE FAB */}
         <div className="md:hidden fixed bottom-16 right-5 flex flex-col gap-2 z-50">
           <button
             onClick={onCreateFolder}

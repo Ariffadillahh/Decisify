@@ -14,7 +14,6 @@ export const useAiAssistant = () => {
     setResult(null);
 
     try {
-      // Pastikan backend kamu jalan di 3000
       const endpoint = `${API_URL}/ai/${type}`;
 
       const response = await axios.post(endpoint, {

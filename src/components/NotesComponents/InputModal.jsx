@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const InputModal = ({ isOpen, onClose, onSubmit, title, defaultValue = "" }) => {
   const [value, setValue] = useState(defaultValue);
 
-  // Reset value saat defaultValue berubah atau modal dibuka kembali
   useEffect(() => {
     if (isOpen) setValue(defaultValue);
   }, [isOpen, defaultValue]);

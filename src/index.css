@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-Untuk membuat scroll terlihat rapi dan elegan (tidak clunky seperti bawaan browser), kamu bisa menambahkan CSS custom-scrollbar ini ke dalam file CSS global kamu (biasanya index.css, App.css, atau main.css).
-
-Tambahkan kode berikut di baris paling bawah:
-
-CSS
-/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;

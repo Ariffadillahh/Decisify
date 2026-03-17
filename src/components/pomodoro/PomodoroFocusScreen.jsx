@@ -10,10 +10,9 @@ import {
   FaCompactDisc,
 } from "react-icons/fa";
 import { MdFullscreen, MdFullscreenExit, MdOutlineClose } from "react-icons/md";
-import { BsCalendarDate } from "react-icons/bs";
 import ThemeSelector from "./ThemeSelector";
 import { PLAYLIST } from "../../helpers/pomodoroUtils";
-import { ScoreBadge, StatusBadge, TimeBadge } from "../TaskBadge";
+import { ScoreBadge, TimeBadge } from "../TaskBadge";
 
 const PomodoroFocusScreen = ({
   pomodoro,

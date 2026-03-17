@@ -6,26 +6,21 @@ import { FiArrowLeft, FiCompass } from "react-icons/fi";
 const NotFoundPage = () => {
   return (
     <div className="min-h-screen bg-[#F5F7F8] flex items-center justify-center p-5 font-sans relative overflow-hidden">
-      {/* Efek Glow Latar Belakang */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="max-w-md w-full text-center flex flex-col items-center relative z-10">
-        {/* Kontainer Utama 404 menggunakan Flexbox dan Gap */}
         <motion.div
           initial={{ y: -20, opacity: 0, scale: 0.9 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           transition={{ type: "spring", duration: 0.8, bounce: 0.4 }}
           className="flex items-center justify-center gap-4 md:gap-8 mb-10"
         >
-          {/* Angka 4 Kiri */}
           <h1 className="text-[120px] md:text-[180px] font-black text-[#94A3B8] leading-none select-none tracking-tighter">
             4
           </h1>
 
-          {/* Kapsul "0" di Tengah */}
           <div className="flex items-center justify-center bg-white rounded-full shadow-[0_10px_40px_rgb(0,0,0,0.08)] text-[#007BFF] w-[90px] h-[140px] md:w-[120px] md:h-[180px] z-10">
-            {/* Ikon Kompas Berputar di Dalamnya */}
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
@@ -35,13 +30,11 @@ const NotFoundPage = () => {
             </motion.div>
           </div>
 
-          {/* Angka 4 Kanan */}
           <h1 className="text-[120px] md:text-[180px] font-black text-[#94A3B8] leading-none select-none tracking-tighter">
             4
           </h1>
         </motion.div>
 
-        {/* Teks & Tombol */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

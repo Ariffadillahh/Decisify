@@ -26,7 +26,7 @@ import MainLayouts from "../MainLayouts";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { useTasks } from "../../hooks/useTasks";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../services/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useNotes } from "../../hooks/useNotes";

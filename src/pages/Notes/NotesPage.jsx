@@ -10,21 +10,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   BiSearch,
   BiNote,
-  BiEditAlt,
   BiTrash,
   BiChevronLeft,
   BiText,
   BiTimeFive,
   BiBrain,
   BiLoaderAlt,
-  BiCheckCircle,
   BiAlignLeft,
   BiListUl,
   BiExtension,
-  BiX,
-  BiCopyAlt,
-  BiChevronDown,
-  BiChevronUp,
 } from "react-icons/bi";
 import { debounce } from "lodash";
 import { DragDropContext } from "@hello-pangea/dnd";
@@ -242,9 +236,7 @@ const NoteContentEditor = ({
         </div>
       </div>
 
-      {/* Editor Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {/* PERBAIKAN: Ubah padding md:px-12 menjadi lg:px-12 agar di tablet tidak terlalu sempit */}
         <div className="px-5 lg:px-12 pt-5 lg:pt-10">
           <div className="hidden lg:block">
             <Breadcrumbs
@@ -284,7 +276,6 @@ const NoteContentEditor = ({
                   <BiText size={16} /> {wordCount} Words
                 </span>
 
-                {/* Desktop AI Button */}
                 <button
                   onClick={() => setIsAiMenuOpen(!isAiMenuOpen)}
                   className="hidden lg:flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 transition-all font-bold shadow-lg shadow-indigo-100/50 cursor-pointer ml-auto"
@@ -313,7 +304,6 @@ const NoteContentEditor = ({
       </div>
 
       <AnimatePresence>
-        {/* MODAL: AI MENU (Bottom Sheet di Mobile/Tablet, Modal Center di Desktop) */}
         {isAiMenuOpen && (
           <div className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center p-0 lg:p-4">
             <motion.div
@@ -369,7 +359,6 @@ const NoteContentEditor = ({
           </div>
         )}
 
-        {/* LOADING MODAL */}
         {aiLoading && (
           <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-indigo-950/40 backdrop-blur-md">
             <motion.div
@@ -391,7 +380,6 @@ const NoteContentEditor = ({
           </div>
         )}
 
-        {/* MODAL LAINNYA: Config & Warning */}
         {showConfig && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
             <motion.div
