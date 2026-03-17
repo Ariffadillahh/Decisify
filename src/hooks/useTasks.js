@@ -259,11 +259,19 @@ export const useTasks = () => {
     window.dispatchEvent(new Event("tasks_updated"));
   };
 
-  const handleDelete = async (id) => {
-    await deleteTask(id);
-    fetchTasks();
-    window.dispatchEvent(new Event("tasks_updated"));
-    gooeyToast.success("Tugas dihapus.");
+  const handleDelete = async (e, id) => {
+    if (e) {
+      e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
+
+    try {
+      await db.tasks.delete(id); 
+      fetchTasks();
+      gooeyToast.success("Tugas dihapus"); 
+    } catch (error) {
+      console.error("Gagal menghapus:", error);
+    }
   };
 
   const fetchArchivedTasks = async () => {

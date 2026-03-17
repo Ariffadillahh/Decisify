@@ -104,7 +104,12 @@ const AgendaList = ({
 
   const handleConfirmDelete = () => {
     if (taskToDelete) {
-      onDeleteTask(taskToDelete);
+      const fakeEvent = { 
+        stopPropagation: () => {}, 
+        preventDefault: () => {} 
+      };
+      
+      onDeleteTask(fakeEvent, taskToDelete);
     }
     setDeleteModalOpen(false);
     setTaskToDelete(null);

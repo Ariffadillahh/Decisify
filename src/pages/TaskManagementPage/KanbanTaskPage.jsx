@@ -116,7 +116,10 @@ const KanbanTaskPage = () => {
 
   const handleConfirmDelete = () => {
     if (taskToDelete) {
-      const fakeEvent = { stopPropagation: () => {} };
+      const fakeEvent = { 
+        stopPropagation: () => {}, 
+        preventDefault: () => {} 
+      };
       handleDelete(fakeEvent, taskToDelete);
     }
     setDeleteModalOpen(false);
