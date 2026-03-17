@@ -1,15 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FiUser,
-  FiBriefcase,
-  FiBookOpen,
-  FiAward,
-  FiArrowRight,
-  FiX,
-  FiUploadCloud,
-  FiLoader,
-} from "react-icons/fi";
+import { FiUser, FiBriefcase, FiBookOpen, FiAward, FiArrowRight, FiX, FiUploadCloud, FiLoader } from "react-icons/fi";
 import { db } from "../../services/db";
 import { gooeyToast } from "goey-toast";
 
@@ -27,9 +18,19 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name.trim() !== "" && role !== "") {
-      onSave({ name: name.trim(), role });
+
+    const nameRegex = /^[a-zA-Z\s]+$/;
+
+    if (name.trim() === "" || role === "") {
+      return;
     }
+
+    if (!nameRegex.test(name)) {
+      alert("Nama hanya boleh berisi huruf!");
+      return;
+    }
+
+    onSave({ name: name.trim(), role });
   };
 
   const handleImportData = (e) => {
@@ -48,39 +49,20 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
 
         if (!db.isOpen()) await db.open();
 
-        await db.transaction(
-          "rw",
-          [
-            db.users,
-            db.category,
-            db.tasks,
-            db.folders,
-            db.notes,
-            db.focus_sessions,
-          ],
-          async () => {
-            await Promise.all([
-              db.users.clear(),
-              db.category.clear(),
-              db.tasks.clear(),
-              db.folders.clear(),
-              db.notes.clear(),
-              db.focus_sessions.clear(),
-            ]);
+        await db.transaction("rw", [db.users, db.category, db.tasks, db.folders, db.notes, db.focus_sessions], async () => {
+          await Promise.all([db.users.clear(), db.category.clear(), db.tasks.clear(), db.folders.clear(), db.notes.clear(), db.focus_sessions.clear()]);
 
-            const singleUser =
-              dbData.users && dbData.users.length > 0 ? [dbData.users[0]] : [];
+          const singleUser = dbData.users && dbData.users.length > 0 ? [dbData.users[0]] : [];
 
-            await Promise.all([
-              db.users.bulkAdd(singleUser),
-              db.category.bulkAdd(dbData.categories || []),
-              db.tasks.bulkAdd(dbData.tasks || []),
-              db.folders.bulkAdd(dbData.folders || []),
-              db.notes.bulkAdd(dbData.notes || []),
-              db.focus_sessions.bulkAdd(dbData.focusSessions || []),
-            ]);
-          },
-        );
+          await Promise.all([
+            db.users.bulkAdd(singleUser),
+            db.category.bulkAdd(dbData.categories || []),
+            db.tasks.bulkAdd(dbData.tasks || []),
+            db.folders.bulkAdd(dbData.folders || []),
+            db.notes.bulkAdd(dbData.notes || []),
+            db.focus_sessions.bulkAdd(dbData.focusSessions || []),
+          ]);
+        });
 
         const profile = json.userProfile || (dbData.users && dbData.users[0]);
         if (profile) {
@@ -110,13 +92,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={!isImporting ? onClose : null}
-          />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={!isImporting ? onClose : null} />
 
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -126,12 +102,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
           >
             <AnimatePresence>
               {isImporting && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-[50] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center"
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-[50] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{
@@ -143,29 +114,16 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
                   >
                     <FiLoader size={48} />
                   </motion.div>
-                  <p className="text-slate-900 font-black text-lg">
-                    Memulihkan Data...
-                  </p>
-                  <p className="text-slate-500 text-sm">
-                    Mohon tunggu sebentar
-                  </p>
+                  <p className="text-slate-900 font-black text-lg">Memulihkan Data...</p>
+                  <p className="text-slate-500 text-sm">Mohon tunggu sebentar</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".json"
-              onChange={handleImportData}
-            />
+            <input type="file" ref={fileInputRef} className="hidden" accept=".json" onChange={handleImportData} />
 
             {!isImporting && (
-              <button
-                onClick={onClose}
-                className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all duration-200 z-20"
-              >
+              <button onClick={onClose} className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all duration-200 z-20">
                 <FiX size={24} />
               </button>
             )}
@@ -174,12 +132,8 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
               <div className="w-16 h-16 bg-blue-50 text-[#007BFF] rounded-full flex items-center justify-center mx-auto mb-5 shadow-sm border border-blue-100">
                 <FiUser size={32} />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">
-                Selamat Datang!
-              </h2>
-              <p className="text-slate-500 text-sm font-medium px-4">
-                Sudah punya akun Decisify sebelumnya?
-              </p>
+              <h2 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Selamat Datang!</h2>
+              <p className="text-slate-500 text-sm font-medium px-4">Sudah punya akun Decisify sebelumnya?</p>
 
               <button
                 type="button"
@@ -192,9 +146,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
 
             <div className="flex items-center px-10 mb-2">
               <div className="flex-1 h-[1px] bg-slate-100"></div>
-              <span className="px-3 text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                Atau Baru Di Sini?
-              </span>
+              <span className="px-3 text-[10px] font-black text-slate-300 uppercase tracking-widest">Atau Baru Di Sini?</span>
               <div className="flex-1 h-[1px] bg-slate-100"></div>
             </div>
 
@@ -202,12 +154,8 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">
-                      Nama Lengkap
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-medium pr-1">
-                      {name.length || 0}/50
-                    </span>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">Nama Lengkap</label>
+                    <span className="text-[10px] text-slate-400 font-medium pr-1">{name.length || 0}/50</span>
                   </div>
                   <input
                     type="text"
@@ -221,9 +169,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2 ml-1">
-                    Status Saat Ini
-                  </label>
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2 ml-1">Status Saat Ini</label>
                   <div className="grid grid-cols-3 gap-3">
                     {roles.map((r) => {
                       const Icon = r.icon;
@@ -234,17 +180,11 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
                           key={r.id}
                           onClick={() => setRole(r.id)}
                           className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 ${
-                            isSelected
-                              ? "border-[#007BFF] bg-blue-50/50 text-[#007BFF] shadow-sm scale-105"
-                              : "border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:bg-slate-50"
+                            isSelected ? "border-[#007BFF] bg-blue-50/50 text-[#007BFF] shadow-sm scale-105" : "border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:bg-slate-50"
                           }`}
                         >
                           <Icon size={24} className="mb-2" />
-                          <span
-                            className={`text-[10px] font-bold tracking-wide ${isSelected ? "text-[#007BFF]" : "text-slate-500"}`}
-                          >
-                            {r.label}
-                          </span>
+                          <span className={`text-[10px] font-bold tracking-wide ${isSelected ? "text-[#007BFF]" : "text-slate-500"}`}>{r.label}</span>
                         </button>
                       );
                     })}
@@ -255,9 +195,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
                   type="submit"
                   disabled={!name.trim() || !role || isImporting}
                   className={`w-full py-4 mt-2 flex items-center justify-center gap-2 rounded-2xl font-black text-sm transition-all duration-300 ${
-                    name.trim() && role
-                      ? "bg-[#007BFF] text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
-                      : "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
+                    name.trim() && role ? "bg-[#007BFF] text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:-translate-y-0.5 active:scale-95 cursor-pointer" : "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
                   }`}
                 >
                   Mulai Gunakan Decisify <FiArrowRight size={18} />

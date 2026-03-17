@@ -1,25 +1,7 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  BiSearch,
-  BiNote,
-  BiTrash,
-  BiChevronLeft,
-  BiText,
-  BiTimeFive,
-  BiBrain,
-  BiLoaderAlt,
-  BiAlignLeft,
-  BiListUl,
-  BiExtension,
-} from "react-icons/bi";
+import { BiSearch, BiNote, BiTrash, BiChevronLeft, BiText, BiTimeFive, BiBrain, BiLoaderAlt, BiAlignLeft, BiListUl, BiExtension } from "react-icons/bi";
 import { debounce } from "lodash";
 import { DragDropContext } from "@hello-pangea/dnd";
 
@@ -32,26 +14,12 @@ import Breadcrumbs from "../../components/NotesComponents/Breadcrumbs";
 import { useNotes } from "../../hooks/useNotes";
 import { useAiAssistant } from "../../hooks/useAiAssistant";
 
-const NoteContentEditor = ({
-  activeNote,
-  folders,
-  allNotes,
-  onSelectNote,
-  updateNoteTitle,
-  updateNoteContent,
-  onDeleteTrigger,
-  onBack,
-}) => {
+const NoteContentEditor = ({ activeNote, folders, allNotes, onSelectNote, updateNoteTitle, updateNoteContent, onDeleteTrigger, onBack }) => {
   const [title, setTitle] = useState(activeNote?.title || "");
   const [wordCount, setWordCount] = useState(0);
   const textareaRef = useRef(null);
 
-  const {
-    generateAi,
-    loading: aiLoading,
-    result: aiResult,
-    resetResult,
-  } = useAiAssistant();
+  const { generateAi, loading: aiLoading, result: aiResult, resetResult } = useAiAssistant();
   const [isAiMenuOpen, setIsAiMenuOpen] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -70,11 +38,8 @@ const NoteContentEditor = ({
   const getPlainText = (jsonContent) => {
     if (!jsonContent) return "";
     try {
-      const blocks =
-        typeof jsonContent === "string" ? JSON.parse(jsonContent) : jsonContent;
-      const contentArray = Array.isArray(blocks)
-        ? blocks
-        : blocks?.content || [];
+      const blocks = typeof jsonContent === "string" ? JSON.parse(jsonContent) : jsonContent;
+      const contentArray = Array.isArray(blocks) ? blocks : blocks?.content || [];
       return contentArray
         .map((block) => {
           if (block.content && Array.isArray(block.content)) {
@@ -102,11 +67,7 @@ const NoteContentEditor = ({
     if (!textarea) return;
     const adjustHeight = () => {
       textarea.style.setProperty("height", "0px", "important");
-      textarea.style.setProperty(
-        "height",
-        `${textarea.scrollHeight}px`,
-        "important",
-      );
+      textarea.style.setProperty("height", `${textarea.scrollHeight}px`, "important");
     };
     const resizeObserver = new ResizeObserver(adjustHeight);
     resizeObserver.observe(textarea);
@@ -114,10 +75,7 @@ const NoteContentEditor = ({
     return () => resizeObserver.disconnect();
   }, [title, activeNote?.id]);
 
-  const debouncedTitleUpdate = useMemo(
-    () => debounce((id, val) => updateNoteTitle(id, val), 800),
-    [updateNoteTitle],
-  );
+  const debouncedTitleUpdate = useMemo(() => debounce((id, val) => updateNoteTitle(id, val), 800), [updateNoteTitle]);
 
   useEffect(() => {
     const text = getPlainText(activeNote?.content);
@@ -160,10 +118,7 @@ const NoteContentEditor = ({
     const data = aiResult?.data;
     if (!data) return;
     try {
-      let parsed =
-        typeof activeNote.content === "string"
-          ? JSON.parse(activeNote.content)
-          : activeNote.content;
+      let parsed = typeof activeNote.content === "string" ? JSON.parse(activeNote.content) : activeNote.content;
       let blocks = Array.isArray(parsed) ? parsed : [];
       const newBlocks = [
         {
@@ -196,10 +151,7 @@ const NoteContentEditor = ({
           content: [{ type: "text", text: data.summary || "", styles: {} }],
         });
       }
-      updateNoteContent(
-        activeNote.id,
-        JSON.stringify([...blocks, ...newBlocks]),
-      );
+      updateNoteContent(activeNote.id, JSON.stringify([...blocks, ...newBlocks]));
       setShowResultModal(false);
       resetResult();
     } catch (e) {
@@ -208,29 +160,16 @@ const NoteContentEditor = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-col h-full bg-white relative overflow-hidden min-w-0"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full bg-white relative overflow-hidden min-w-0">
       <div className="xl:hidden flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white/90 backdrop-blur-md sticky top-0 z-20 shrink-0 shadow-sm">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1 text-indigo-600 font-bold text-sm cursor-pointer active:scale-95 transition-transform"
-        >
+        <button onClick={onBack} className="flex items-center gap-1 text-indigo-600 font-bold text-sm cursor-pointer active:scale-95 transition-transform">
           <BiChevronLeft size={24} /> Kembali
         </button>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsAiMenuOpen(true)}
-            className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl active:scale-90 transition-transform shadow-sm"
-          >
+          <button onClick={() => setIsAiMenuOpen(true)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl active:scale-90 transition-transform shadow-sm">
             <BiBrain size={20} />
           </button>
-          <button
-            onClick={() => onDeleteTrigger(activeNote, "note")}
-            className="p-2.5 bg-red-50 text-red-500 rounded-xl active:scale-90 transition-transform shadow-sm"
-          >
+          <button onClick={() => onDeleteTrigger(activeNote, "note")} className="p-2.5 bg-red-50 text-red-500 rounded-xl active:scale-90 transition-transform shadow-sm">
             <BiTrash size={20} />
           </button>
         </div>
@@ -239,12 +178,7 @@ const NoteContentEditor = ({
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         <div className="px-5 lg:px-12 pt-5 lg:pt-10">
           <div className="hidden lg:block">
-            <Breadcrumbs
-              activeNote={activeNote}
-              folders={folders}
-              allNotes={allNotes}
-              onSelectNote={onSelectNote}
-            />
+            <Breadcrumbs activeNote={activeNote} folders={folders} allNotes={allNotes} onSelectNote={onSelectNote} />
           </div>
 
           <div className="flex justify-between items-start gap-4 mt-2 min-w-0">
@@ -262,17 +196,9 @@ const NoteContentEditor = ({
               />
               <div className="flex flex-wrap items-center gap-4 mt-3 text-[11px] lg:text-xs text-slate-400 font-bold uppercase tracking-wider min-w-0">
                 <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg">
-                  <BiTimeFive className="text-indigo-400" size={16} />{" "}
-                  {activeNote?.updatedAt
-                    ? new Date(activeNote.updatedAt).toLocaleDateString(
-                        "id-ID",
-                        { day: "numeric", month: "short" },
-                      )
-                    : "-"}
+                  <BiTimeFive className="text-indigo-400" size={16} /> {activeNote?.updatedAt ? new Date(activeNote.updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "-"}
                 </span>
-                <span
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${wordCount < 50 ? "bg-orange-50 text-orange-500" : "bg-slate-50"}`}
-                >
+                <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${wordCount < 50 ? "bg-orange-50 text-orange-500" : "bg-slate-50"}`}>
                   <BiText size={16} /> {wordCount} Words
                 </span>
 
@@ -285,10 +211,7 @@ const NoteContentEditor = ({
               </div>
             </div>
 
-            <button
-              onClick={() => onDeleteTrigger(activeNote, "note")}
-              className="hidden lg:flex items-center justify-center p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all shrink-0 mt-1 cursor-pointer"
-            >
+            <button onClick={() => onDeleteTrigger(activeNote, "note")} className="hidden lg:flex items-center justify-center p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all shrink-0 mt-1 cursor-pointer">
               <BiTrash size={24} />
             </button>
           </div>
@@ -296,23 +219,14 @@ const NoteContentEditor = ({
         </div>
 
         <div className="px-5 lg:px-12 pb-32 pt-4 min-w-0">
-          <NoteEditor
-            initialContent={activeNote?.content}
-            onChange={(content) => updateNoteContent(activeNote?.id, content)}
-          />
+          <NoteEditor initialContent={activeNote?.content} onChange={(content) => updateNoteContent(activeNote?.id, content)} />
         </div>
       </div>
 
       <AnimatePresence>
         {isAiMenuOpen && (
-          <div className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center p-0 lg:p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-              onClick={() => setIsAiMenuOpen(false)}
-            />
+          <div className="fixed inset-0 z-100 flex items-end lg:items-center justify-center p-0 lg:p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsAiMenuOpen(false)} />
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
@@ -321,12 +235,8 @@ const NoteContentEditor = ({
               className="bg-white w-full lg:max-w-md rounded-t-[2rem] lg:rounded-[2rem] p-6 lg:p-8 shadow-2xl z-10 relative overflow-hidden"
             >
               <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 lg:hidden" />
-              <h3 className="text-2xl font-black text-slate-800 mb-1 uppercase italic tracking-tighter">
-                AI Assistant
-              </h3>
-              <p className="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">
-                Pilih mode analisis
-              </p>
+              <h3 className="text-2xl font-black text-slate-800 mb-1 uppercase italic tracking-tighter">AI Assistant</h3>
+              <p className="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">Pilih mode analisis</p>
 
               <div className="grid gap-3 pb-4 lg:pb-0">
                 {["summary", "keypoints", "quiz"].map((type) => (
@@ -337,21 +247,11 @@ const NoteContentEditor = ({
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-2.5 bg-white rounded-xl shadow-sm text-indigo-500 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                        {type === "summary" ? (
-                          <BiAlignLeft size={22} />
-                        ) : type === "keypoints" ? (
-                          <BiListUl size={22} />
-                        ) : (
-                          <BiExtension size={22} />
-                        )}
+                        {type === "summary" ? <BiAlignLeft size={22} /> : type === "keypoints" ? <BiListUl size={22} /> : <BiExtension size={22} />}
                       </div>
-                      <span className="text-slate-700 font-bold text-sm lg:text-base capitalize">
-                        AI {type}
-                      </span>
+                      <span className="text-slate-700 font-bold text-sm lg:text-base capitalize">AI {type}</span>
                     </div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase bg-white px-2 py-1 rounded-md shadow-sm">
-                      Min {MIN_WORDS[type]}w
-                    </span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase bg-white px-2 py-1 rounded-md shadow-sm">Min {MIN_WORDS[type]}w</span>
                   </button>
                 ))}
               </div>
@@ -361,64 +261,30 @@ const NoteContentEditor = ({
 
         {aiLoading && (
           <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-indigo-950/40 backdrop-blur-md">
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              className="bg-white rounded-[2.5rem] p-10 lg:p-12 shadow-2xl flex flex-col items-center"
-            >
-              <BiLoaderAlt
-                className="text-indigo-600 animate-spin mb-6"
-                size={56}
-              />
-              <h3 className="text-xl lg:text-2xl font-black text-slate-900 italic uppercase leading-none">
-                Analyzing...
-              </h3>
-              <p className="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest">
-                Harap tunggu sebentar
-              </p>
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-white rounded-[2.5rem] p-10 lg:p-12 shadow-2xl flex flex-col items-center">
+              <BiLoaderAlt className="text-indigo-600 animate-spin mb-6" size={56} />
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 italic uppercase leading-none">Analyzing...</h3>
+              <p className="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest">Harap tunggu sebentar</p>
             </motion.div>
           </div>
         )}
 
         {showConfig && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              className="bg-white rounded-[2rem] p-6 lg:p-8 shadow-2xl max-w-[90%] lg:max-w-sm w-full relative border-t-8 border-indigo-600"
-            >
-              <h3 className="text-xl font-black text-slate-800 uppercase italic leading-none">
-                Setup Intelligence
-              </h3>
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-white rounded-[2rem] p-6 lg:p-8 shadow-2xl max-w-[90%] lg:max-w-sm w-full relative border-t-8 border-indigo-600">
+              <h3 className="text-xl font-black text-slate-800 uppercase italic leading-none">Setup Intelligence</h3>
               <div className="mt-8 mb-8">
                 <div className="flex justify-between items-end mb-4">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
-                    Jumlah {configType}
-                  </label>
-                  <span className="text-5xl font-black text-indigo-600 leading-none">
-                    {configValue}
-                  </span>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Jumlah {configType}</label>
+                  <span className="text-5xl font-black text-indigo-600 leading-none">{configValue}</span>
                 </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={configValue}
-                  onChange={(e) => setConfigValue(e.target.value)}
-                  className="w-full h-3 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                />
+                <input type="range" min="1" max="10" value={configValue} onChange={(e) => setConfigValue(e.target.value)} className="w-full h-3 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
               </div>
               <div className="flex gap-3">
-                <button
-                  onClick={() => setShowConfig(false)}
-                  className="flex-1 py-4 font-bold text-slate-400 bg-slate-50 rounded-2xl uppercase text-xs tracking-widest cursor-pointer hover:bg-slate-100 transition-colors"
-                >
+                <button onClick={() => setShowConfig(false)} className="flex-1 py-4 font-bold text-slate-400 bg-slate-50 rounded-2xl uppercase text-xs tracking-widest cursor-pointer hover:bg-slate-100 transition-colors">
                   Batal
                 </button>
-                <button
-                  onClick={handleGenerateAi}
-                  className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all uppercase text-xs tracking-widest cursor-pointer"
-                >
+                <button onClick={handleGenerateAi} className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all uppercase text-xs tracking-widest cursor-pointer">
                   Generate
                 </button>
               </div>
@@ -428,28 +294,15 @@ const NoteContentEditor = ({
 
         {showWarning && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              className="bg-white rounded-[2rem] p-8 lg:p-10 shadow-2xl max-w-[90%] lg:max-w-xs w-full text-center border-b-8 border-orange-500"
-            >
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-white rounded-[2rem] p-8 lg:p-10 shadow-2xl max-w-[90%] lg:max-w-xs w-full text-center border-b-8 border-orange-500">
               <div className="w-20 h-20 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <BiText size={40} />
               </div>
-              <h3 className="text-xl font-black text-slate-800 uppercase italic leading-tight">
-                Terlalu Pendek
-              </h3>
+              <h3 className="text-xl font-black text-slate-800 uppercase italic leading-tight">Terlalu Pendek</h3>
               <p className="text-sm text-slate-500 mt-3 font-medium leading-relaxed">
-                Dibutuhkan minimal{" "}
-                <span className="text-indigo-600 font-black">
-                  {MIN_WORDS[configType]} kata
-                </span>{" "}
-                agar AI bisa menganalisis dengan baik.
+                Dibutuhkan minimal <span className="text-indigo-600 font-black">{MIN_WORDS[configType]} kata</span> agar AI bisa menganalisis dengan baik.
               </p>
-              <button
-                onClick={() => setShowWarning(false)}
-                className="mt-8 w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold uppercase text-xs tracking-widest cursor-pointer transition-colors"
-              >
+              <button onClick={() => setShowWarning(false)} className="mt-8 w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold uppercase text-xs tracking-widest cursor-pointer transition-colors">
                 Saya Mengerti
               </button>
             </motion.div>
@@ -463,22 +316,7 @@ const NoteContentEditor = ({
 const NotesPage = () => {
   const { noteId } = useParams();
   const navigate = useNavigate();
-  const {
-    folders,
-    notes,
-    recentNotes,
-    activeNote,
-    setActiveNote,
-    addFolder,
-    updateFolderTitle,
-    deleteFolderFromDB,
-    addNote,
-    moveNoteToFolder,
-    updateNoteContent,
-    updateNoteTitle,
-    deleteNoteFromDB,
-    updateFolderColor,
-  } = useNotes();
+  const { folders, notes, recentNotes, activeNote, setActiveNote, addFolder, updateFolderTitle, deleteFolderFromDB, addNote, moveNoteToFolder, updateNoteContent, updateNoteTitle, deleteNoteFromDB, updateFolderColor } = useNotes();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -531,30 +369,18 @@ const NotesPage = () => {
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
     if (!destination) return;
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return;
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
     moveNoteToFolder(draggableId, destination.droppableId);
   };
 
   return (
-    <NotesLayout
-      onCreateFolder={() => setInputModal({ isOpen: true, parentId: null })}
-      onCreateNote={async () => navigate(`/notes/${await addNote(null)}`)}
-    >
+    <NotesLayout onCreateFolder={() => setInputModal({ isOpen: true, parentId: null })} onCreateNote={async () => navigate(`/notes/${await addNote(null)}`)}>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex flex-1 h-full overflow-hidden bg-white">
-          <aside
-            className={`${isSidebarOpen ? "flex w-full xl:w-70" : "hidden xl:flex xl:w-80"} border-r border-slate-100 bg-slate-50/50 flex-col transition-all duration-300 overflow-hidden shrink-0 z-10`}
-          >
+          <aside className={`${isSidebarOpen ? "flex w-full xl:w-70" : "hidden xl:flex xl:w-80"} border-r border-slate-100 bg-slate-50/50 flex-col transition-all duration-300 overflow-hidden shrink-0 z-10`}>
             <div className="p-4 lg:p-5">
               <div className="relative">
-                <BiSearch
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                  size={18}
-                />
+                <BiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   type="text"
                   placeholder="Cari catatan..."
@@ -574,27 +400,17 @@ const NotesPage = () => {
                 setActiveNote(n);
                 navigate(`/notes/${n.id}`);
               }}
-              onAddSubNote={async (fid) =>
-                navigate(`/notes/${await addNote(fid)}`)
-              }
-              onAddSubFolder={(fid) =>
-                setInputModal({ isOpen: true, parentId: fid })
-              }
-              onDeleteNote={(n) =>
-                setConfirmModal({ isOpen: true, type: "note", data: n })
-              }
+              onAddSubNote={async (fid) => navigate(`/notes/${await addNote(fid)}`)}
+              onAddSubFolder={(fid) => setInputModal({ isOpen: true, parentId: fid })}
+              onDeleteNote={(n) => setConfirmModal({ isOpen: true, type: "note", data: n })}
               onRenameFolder={(id, name) => updateFolderTitle(id, name)}
-              onDeleteFolder={(f) =>
-                setConfirmModal({ isOpen: true, type: "folder", data: f })
-              }
+              onDeleteFolder={(f) => setConfirmModal({ isOpen: true, type: "folder", data: f })}
               onUpdateFolderColor={(id, color) => updateFolderColor(id, color)}
               searchTerm={searchTerm}
             />
           </aside>
 
-          <main
-            className={`${!isSidebarOpen ? "flex" : "hidden xl:flex"} flex-1 flex-col bg-white min-w-0 shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.05)] z-20`}
-          >
+          <main className={`${!isSidebarOpen ? "flex" : "hidden xl:flex"} flex-1 flex-col bg-white min-w-0 shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.05)] z-20`}>
             {activeNote ? (
               <NoteContentEditor
                 key={activeNote.id}
@@ -604,9 +420,7 @@ const NotesPage = () => {
                 onSelectNote={setActiveNote}
                 updateNoteTitle={updateNoteTitle}
                 updateNoteContent={updateNoteContent}
-                onDeleteTrigger={(item, type) =>
-                  setConfirmModal({ isOpen: true, type, data: item })
-                }
+                onDeleteTrigger={(item, type) => setConfirmModal({ isOpen: true, type, data: item })}
                 onBack={handleMobileBack}
               />
             ) : (
@@ -615,13 +429,8 @@ const NotesPage = () => {
                   <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
                     <BiNote size={40} className="text-indigo-400" />
                   </div>
-                  <h3 className="text-2xl lg:text-3xl font-black text-slate-800 break-words tracking-tight">
-                    Ruang Coretan
-                  </h3>
-                  <p className="text-sm text-slate-400 mt-2 font-medium max-w-[250px] leading-relaxed">
-                    Pilih catatan dari samping atau buat catatan baru untuk
-                    mulai menulis.
-                  </p>
+                  <h3 className="text-2xl lg:text-3xl font-black text-slate-800 break-words tracking-tight">Ruang Coretan</h3>
+                  <p className="text-sm text-slate-400 mt-2 font-medium max-w-[250px] leading-relaxed">Pilih catatan dari samping atau buat catatan baru untuk mulai menulis.</p>
                 </div>
               </div>
             )}

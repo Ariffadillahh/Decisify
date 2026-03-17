@@ -4,14 +4,7 @@ import { FiX, FiCheck, FiCalendar, FiClock, FiActivity } from "react-icons/fi";
 import { BsFolderPlus, BsFolder2Open } from "react-icons/bs";
 import BaseModal from "../../components/Modal/BaseModal";
 
-const TaskModal = ({
-  isEditMode,
-  formData,
-  handleChange,
-  handleSubmit,
-  setIsModalOpen,
-  isOpen = true,
-}) => {
+const TaskModal = ({ isEditMode, formData, handleChange, handleSubmit, setIsModalOpen, isOpen = true }) => {
   const [categories, setCategories] = useState([]);
   const [isNewCategory, setIsNewCategory] = useState(false);
 
@@ -29,26 +22,13 @@ const TaskModal = ({
   }, []);
 
   return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={() => setIsModalOpen(false)}
-      className="rounded-3xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
-    >
+    <BaseModal isOpen={isOpen} onClose={() => setIsModalOpen(false)} className="rounded-3xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
         <div>
-          <h3 className="text-xl font-extrabold text-slate-900">
-            {isEditMode ? "Edit Tugas" : "Tugas Baru"}
-          </h3>
-          <p className="text-slate-500 text-xs font-medium mt-1">
-            {isEditMode
-              ? "Perbarui detail tugas Anda."
-              : "Tuliskan detail tugas untuk dianalisis."}
-          </p>
+          <h3 className="text-xl font-extrabold text-slate-900">{isEditMode ? "Edit Tugas" : "Tugas Baru"}</h3>
+          <p className="text-slate-500 text-xs font-medium mt-1">{isEditMode ? "Perbarui detail tugas Anda." : "Tuliskan detail tugas untuk dianalisis."}</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(false)}
-          className="p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
-        >
+        <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
           <FiX size={20} />
         </button>
       </div>
@@ -57,12 +37,8 @@ const TaskModal = ({
         <form id="task-form" onSubmit={handleSubmit} className="space-y-6">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">
-                Nama Tugas
-              </label>
-              <span className="text-[10px] text-slate-400 font-medium">
-                {formData.title?.length || 0}/80
-              </span>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Nama Tugas</label>
+              <span className="text-[10px] text-slate-400 font-medium">{formData.title?.length || 0}/80</span>
             </div>
             <input
               type="text"
@@ -110,10 +86,7 @@ const TaskModal = ({
                       {cat.name}
                     </option>
                   ))}
-                  <option
-                    value="NEW_CATEGORY"
-                    className="font-bold text-[#007BFF]"
-                  >
+                  <option value="NEW_CATEGORY" className="font-bold text-[#007BFF]">
                     + Buat Kategori Baru...
                   </option>
                 </select>
@@ -141,13 +114,7 @@ const TaskModal = ({
                     maxLength={50}
                   />
                   {}
-                  <span
-                    className={`absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-medium ${
-                      categories.length > 0 ? "right-20" : "right-5"
-                    }`}
-                  >
-                    {formData.category?.length || 0}/50
-                  </span>
+                  <span className={`absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-medium ${categories.length > 0 ? "right-20" : "right-5"}`}>{formData.category?.length || 0}/50</span>
 
                   {categories.length > 0 && (
                     <button
@@ -191,9 +158,7 @@ const TaskModal = ({
                 <label className="block text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
                   <FiActivity size={12} className="text-orange-500" /> Sulit
                 </label>
-                <span className="font-black text-lg text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-100 shadow-sm">
-                  {formData.tingkat_kesulitan || 1}
-                </span>
+                <span className="font-black text-lg text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-100 shadow-sm">{formData.tingkat_kesulitan || 1}</span>
               </div>
 
               <input
@@ -224,10 +189,7 @@ const TaskModal = ({
                     handleChange({
                       target: {
                         name: "estimasi_jam",
-                        value: Math.max(
-                          1,
-                          (parseInt(formData.estimasi_jam) || 1) - 1,
-                        ),
+                        value: Math.max(1, (parseInt(formData.estimasi_jam) || 1) - 1),
                       },
                     })
                   }
@@ -240,6 +202,7 @@ const TaskModal = ({
                   type="number"
                   name="estimasi_jam"
                   min="1"
+                  max="24"
                   className="w-10 bg-transparent font-black text-xl text-slate-800 outline-none text-center appearance-none"
                   value={formData.estimasi_jam || 1}
                   onChange={handleChange}
@@ -269,11 +232,7 @@ const TaskModal = ({
       </div>
 
       <div className="px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex gap-4 shrink-0 rounded-b-[2rem]">
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(false)}
-          className="flex-1 py-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 bg-slate-100 rounded-xl transition-colors"
-        >
+        <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 bg-slate-100 rounded-xl transition-colors">
           Batal
         </button>
         <button

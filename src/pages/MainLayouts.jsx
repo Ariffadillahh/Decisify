@@ -14,7 +14,7 @@ const MainLayouts = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans overflow-x-hidden">
-      <header className="w-full h-[80px] fixed top-0 left-0 z-50 bg-white border-b border-slate-100 flex items-center">
+      <header className="w-full h-[80px] fixed top-0 left-0 z-50 bg-white border-b border-slate-100 flex items-center ">
         <div className="w-full">
           <NavbarDashboard />
         </div>
@@ -25,7 +25,7 @@ const MainLayouts = ({ children }) => {
           <Sidebars />
         </aside>
 
-        <main className="flex-1 md:pr-0 md:py-4 md:pl-2 w-full md:ml-[280px] min-h-[calc(100vh-80px)] min-w-0">{children}</main>
+        <main className="flex-1 md:pr-0 md:py-4 md:pl-2 w-full md:ml-[280px] min-h-[calc(100vh-80px)] min-w-0 z-40">{children}</main>
       </div>
     </div>
   );

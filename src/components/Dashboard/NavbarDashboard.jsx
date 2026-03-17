@@ -78,53 +78,31 @@ const NavbarDashboard = () => {
 
   const filteredNotes = useMemo(() => {
     if (!searchQuery.trim() || !notes) return [];
-    return notes
-      .filter((n) => n.title?.toLowerCase().includes(searchQuery.toLowerCase()))
-      .slice(0, 4);
+    return notes.filter((n) => n.title?.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4);
   }, [searchQuery, notes]);
 
   const filteredTasks = useMemo(() => {
     if (!searchQuery.trim() || !allRawTasks) return [];
-    return allRawTasks
-      .filter((t) => t.title?.toLowerCase().includes(searchQuery.toLowerCase()))
-      .slice(0, 4);
+    return allRawTasks.filter((t) => t.title?.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4);
   }, [searchQuery, allRawTasks]);
 
   return (
     <>
-      <nav className="relative flex items-center justify-between px-4 md:px-8 py-4 bg-white border-b border-slate-100 font-sans w-full drop-shadow-sm z-[60]">
+      <nav className="relative flex items-center justify-between px-4 md:px-8 py-4 bg-white border-b border-slate-100 font-sans w-full drop-shadow-sm z-[80]">
         <div className="flex items-center gap-4 md:gap-8">
-          <button
-            className="md:hidden text-slate-500 hover:text-slate-900 p-1"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
+          <button className="md:hidden text-slate-500 hover:text-slate-900 p-1" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
           </button>
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => navigate("/dashboard")}
-          >
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
             <img src={logo} alt="logo" className="w-9" />
-            <span className="text-xl font-extrabold text-slate-900 tracking-tight hidden sm:block">
-              Decisify
-            </span>
+            <span className="text-xl font-extrabold text-slate-900 tracking-tight hidden sm:block">Decisify</span>
           </div>
           <div className="hidden md:block h-6 w-[1px] bg-slate-200"></div>
-          <div className="hidden md:flex items-center text-sm font-bold text-slate-600">
-            {pageTitle}
-          </div>
+          <div className="hidden md:flex items-center text-sm font-bold text-slate-600">{pageTitle}</div>
         </div>
 
         <div className="flex items-center gap-3 md:gap-6">
-          {!isMobileMenuOpen && (
-            <DesktopSearch
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              filteredNotes={filteredNotes}
-              filteredTasks={filteredTasks}
-              navigate={navigate}
-            />
-          )}
+          {!isMobileMenuOpen && <DesktopSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} filteredNotes={filteredNotes} filteredTasks={filteredTasks} navigate={navigate} />}
 
           <NotificationMenu
             urgentTasks={urgentTasks}
@@ -139,20 +117,12 @@ const NavbarDashboard = () => {
           <div className="hidden md:block h-8 w-[1px] bg-slate-200 rounded-full"></div>
 
           <div className="relative">
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-3 group focus:outline-none cursor-pointer"
-            >
+            <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 group focus:outline-none cursor-pointer">
               <div className="hidden md:flex flex-col items-end">
-                <span
-                  className="text-sm font-black text-slate-900 leading-tight group-hover:text-[#007BFF] transition-colors truncate max-w-[130px]"
-                  title={user?.name || "Guest"}
-                >
+                <span className="text-sm font-black text-slate-900 leading-tight group-hover:text-[#007BFF] transition-colors truncate max-w-[130px]" title={user?.name || "Guest"}>
                   {user?.name || "Guest"}
                 </span>
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                  {user?.role || "User"}
-                </span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{user?.role || "User"}</span>
               </div>
               <div className="relative">
                 <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#007BFF] border-2 border-transparent group-hover:border-blue-200 flex items-center justify-center font-black text-lg shadow-sm transition-all duration-300">
@@ -167,10 +137,7 @@ const NavbarDashboard = () => {
             <AnimatePresence>
               {isProfileOpen && (
                 <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setIsProfileOpen(false)}
-                  ></div>
+                  <div className="fixed inset-0 z-10" onClick={() => setIsProfileOpen(false)}></div>
                   <motion.div
                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -178,16 +145,10 @@ const NavbarDashboard = () => {
                     className="absolute right-0 mt-4 w-56 bg-white rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 py-3 z-20 overflow-hidden"
                   >
                     <div className="px-4 py-2 border-b border-slate-50 mb-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                        Akun Saya
-                      </p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Akun Saya</p>
                       <div className="block md:hidden mt-3 mb-1">
-                        <span className="block text-sm font-black text-slate-900 truncate">
-                          {user?.name || "Guest"}
-                        </span>
-                        <span className="block text-[10px] text-[#007BFF] font-bold uppercase tracking-widest mt-0.5">
-                          {user?.role || "User"}
-                        </span>
+                        <span className="block text-sm font-black text-slate-900 truncate">{user?.name || "Guest"}</span>
+                        <span className="block text-[10px] text-[#007BFF] font-bold uppercase tracking-widest mt-0.5">{user?.role || "User"}</span>
                       </div>
                     </div>
 
@@ -219,11 +180,7 @@ const NavbarDashboard = () => {
           menuItems={MENU_ITEMS}
         />
       </nav>
-      <LogoutModal
-        isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={handleLogout}
-      />
+      <LogoutModal isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} onConfirm={handleLogout} />
     </>
   );
 };
