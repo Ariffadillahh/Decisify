@@ -126,7 +126,7 @@ export const useTasks = () => {
       setFormData({
         id: freshTask.id,
         title: freshTask.title,
-        category: resolvedCategoryName, 
+        category: resolvedCategoryName,
         date_deadline: formattedDate,
         tingkat_kesulitan: freshTask.tingkat_kesulitan,
         estimasi_jam: freshTask.estimasi_jam,
@@ -288,14 +288,12 @@ export const useTasks = () => {
   };
 
   const handleDeleteArchivedTask = async (id) => {
-    if (window.confirm("Hapus tugas ini secara permanen?")) {
-      try {
-        await deleteTask(id);
-        gooeyToast.success("Tugas dihapus permanen.");
-        fetchArchivedTasks();
-      } catch (error) {
-        gooeyToast.error("Gagal menghapus tugas.");
-      }
+    try {
+      await deleteTask(id);
+      gooeyToast.success("Tugas dihapus permanen.");
+      fetchArchivedTasks();
+    } catch (error) {
+      gooeyToast.error("Gagal menghapus tugas.");
     }
   };
 
