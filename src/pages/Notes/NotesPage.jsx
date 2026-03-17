@@ -6,7 +6,7 @@ import React, {
   useLayoutEffect,
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   BiSearch,
   BiNote,
@@ -32,6 +32,7 @@ import Breadcrumbs from "../../components/NotesComponents/Breadcrumbs";
 import { useNotes } from "../../hooks/useNotes";
 import { useAiAssistant } from "../../hooks/useAiAssistant";
 import BaseModal from "../../components/Modal/BaseModal";
+import { IoMdClose } from "react-icons/io";
 
 const NoteContentEditor = ({
   activeNote,
@@ -166,6 +167,7 @@ const NoteContentEditor = ({
           ? JSON.parse(activeNote.content)
           : activeNote.content;
       let blocks = Array.isArray(parsed) ? parsed : [];
+
       const newBlocks = [
         {
           type: "heading",
@@ -178,30 +180,116 @@ const NoteContentEditor = ({
           content: [
             {
               type: "text",
-              text: `AI ${configType === "summary" ? "Summary" : "Key Points"}`,
+              text: `AI ${configType === "summary" ? "Summary" : configType === "keypoints" ? "Key Points" : "Quiz"}`,
               styles: { bold: true },
             },
           ],
         },
       ];
+
+      const parseTextWithStyles = (text) => {
+        const parts = text.split(/(\*\*.*?\*\*|\*.*?\*|"[^"]+")/g);
+
+        return parts
+          .filter((p) => p.length > 0)
+          .map((part) => {
+            let styles = {};
+            let cleanText = part;
+
+            if (cleanText.startsWith("**") && cleanText.endsWith("**")) {
+              styles.bold = true;
+              cleanText = cleanText.slice(2, -2);
+            } else if (cleanText.startsWith("*") && cleanText.endsWith("*")) {
+              styles.italic = true;
+              cleanText = cleanText.slice(1, -1);
+            } else if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
+              styles.bold = true;
+              cleanText = cleanText.slice(1, -1);
+            }
+
+            return { type: "text", text: cleanText, styles };
+          });
+      };
+
       if (configType === "keypoints" && Array.isArray(data.key_points)) {
         data.key_points.forEach((point) => {
           newBlocks.push({
             type: "bulletListItem",
-            content: [{ type: "text", text: point, styles: {} }],
+            content: parseTextWithStyles(point),
           });
         });
-      } else {
-        newBlocks.push({
-          type: "paragraph",
-          content: [{ type: "text", text: data.summary || "", styles: {} }],
+      } else if (configType === "summary" && data.summary) {
+        let cleanSummary = data.summary
+          .replace(
+            /^(Berikut adalah|Ini adalah|Berikut ringkasan)[^:]*:\s*/i,
+            "",
+          )
+          .trim();
+
+        const paragraphs = cleanSummary.split(/\n+/);
+
+        paragraphs.forEach((p, index) => {
+          if (p.trim()) {
+            newBlocks.push({
+              type: "paragraph",
+              content: parseTextWithStyles(p.trim()),
+            });
+
+            if (index < paragraphs.length - 1) {
+              newBlocks.push({
+                type: "paragraph",
+                content: [{ type: "text", text: "", styles: {} }],
+              });
+            }
+          }
+        });
+      } else if (configType === "quiz" && (data.quiz || aiResult?.quiz)) {
+        const quizList = data.quiz || aiResult?.quiz;
+
+        quizList.forEach((q, idx) => {
+          newBlocks.push({
+            type: "paragraph",
+            content: [
+              { type: "text", text: `${idx + 1}. `, styles: { bold: true } },
+              ...parseTextWithStyles(q.question),
+            ],
+          });
+
+          q.choices.forEach((choice) => {
+            newBlocks.push({
+              type: "bulletListItem",
+              content: parseTextWithStyles(`${choice.id}. ${choice.text}`),
+            });
+          });
+
+          newBlocks.push({
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: `Jawaban: ${q.correct_answer} - ${q.explanation}`,
+                styles: { italic: true },
+              },
+            ],
+          });
+
+          newBlocks.push({
+            type: "paragraph",
+            content: [{ type: "text", text: "", styles: {} }],
+          });
         });
       }
+
       updateNoteContent(
         activeNote.id,
         JSON.stringify([...blocks, ...newBlocks]),
       );
-      setShowResultModal(false);
+
+      if (configType === "quiz") {
+        setShowQuizModal(false);
+      } else {
+        setShowResultModal(false);
+      }
       resetResult();
     } catch (e) {
       console.error("Insert error:", e);
@@ -347,10 +435,9 @@ const NoteContentEditor = ({
           </div>
         </BaseModal>
 
-        {/* 2. Modal Loading AI */}
         <BaseModal
           isOpen={aiLoading}
-          closeOnBackdrop={false} // Cegah tutup saat klik background
+          closeOnBackdrop={false}
           className="rounded-[2.5rem] p-10 lg:p-12 flex flex-col items-center"
         >
           <BiLoaderAlt
@@ -365,7 +452,6 @@ const NoteContentEditor = ({
           </p>
         </BaseModal>
 
-        {/* 3. Modal Setup Config AI */}
         <BaseModal
           isOpen={showConfig}
           onClose={() => setShowConfig(false)}
@@ -408,7 +494,6 @@ const NoteContentEditor = ({
           </div>
         </BaseModal>
 
-        {/* 4. Modal Warning Terlalu Pendek */}
         <BaseModal
           isOpen={showWarning}
           onClose={() => setShowWarning(false)}
@@ -433,6 +518,190 @@ const NoteContentEditor = ({
           >
             Saya Mengerti
           </button>
+        </BaseModal>
+
+        <BaseModal
+          isOpen={showResultModal}
+          onClose={() => setShowResultModal(false)}
+          className="rounded-[2rem] p-6 lg:p-8 w-full max-w-2xl max-h-[80vh] flex flex-col"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-black text-slate-800 uppercase italic flex items-center gap-2">
+              <BiBrain className="text-indigo-600" />
+              Hasil {configType}
+            </h3>
+            <button
+              onClick={() => setShowResultModal(false)}
+              className="text-slate-400 hover:text-slate-600 p-2"
+            >
+              <IoMdClose size={25} />
+            </button>
+          </div>
+
+          <div className="overflow-y-auto custom-scrollbar flex-1 mb-6 p-4 bg-slate-50 rounded-xl text-slate-700 text-sm md:text-base leading-relaxed border border-slate-100 whitespace-pre-wrap">
+            {configType === "summary" && (
+              <span>
+                {aiResult?.data?.summary
+                  ?.replace(
+                    /^(Berikut adalah|Ini adalah|Berikut ringkasan)[^:]*:\s*/i,
+                    "",
+                  )
+                  .trim()}
+              </span>
+            )}
+            {configType === "keypoints" && (
+              <ul className="list-disc pl-5 space-y-2">
+                {aiResult?.data?.key_points?.map((point, index) => (
+                  <li key={index}>{point}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="flex gap-3 mt-auto pt-2 border-t border-slate-100">
+            <button
+              onClick={() => setShowResultModal(false)}
+              className="flex-1 py-3.5 font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors"
+            >
+              Tutup
+            </button>
+            <button
+              onClick={handleInsertToNote}
+              className="flex-1 py-3.5 font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-lg shadow-indigo-200"
+            >
+              Simpan ke Catatan
+            </button>
+          </div>
+        </BaseModal>
+
+        <BaseModal
+          isOpen={showQuizModal}
+          onClose={() => setShowQuizModal(false)}
+          className="rounded-[2rem] p-6 lg:p-8 w-full max-w-2xl max-h-[85vh] flex flex-col"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-black text-slate-800 uppercase italic flex items-center gap-2">
+              <BiExtension className="text-indigo-600" />
+              Hasil Quiz
+            </h3>
+            <button
+              onClick={() => setShowQuizModal(false)}
+              className="text-slate-400 hover:text-slate-600 p-2 cursor-pointer transition-colors"
+            >
+              <IoMdClose size={25} />
+            </button>
+          </div>
+
+          <div className="overflow-y-auto custom-scrollbar flex-1 mb-6 pr-2">
+            {(aiResult?.data?.quiz || aiResult?.quiz) &&
+            Array.isArray(aiResult?.data?.quiz || aiResult?.quiz) ? (
+              <div className="space-y-6">
+                {(aiResult?.data?.quiz || aiResult?.quiz).map((q, qIndex) => (
+                  <div
+                    key={qIndex}
+                    className="bg-slate-50 p-5 rounded-2xl border border-slate-100"
+                  >
+                    <p className="font-bold text-slate-800 mb-4 text-sm md:text-base">
+                      {qIndex + 1}. {q.question}
+                    </p>
+
+                    <div className="space-y-2">
+                      {q.choices?.map((choice, cIndex) => {
+                        const isSelected = userAnswers[qIndex] === choice.id;
+                        const isCorrect = choice.id === q.correct_answer;
+                        const showResult = quizSubmitted;
+
+                        let btnClass =
+                          "border-slate-200 bg-white hover:border-indigo-300 text-slate-600";
+                        if (showResult) {
+                          if (isCorrect)
+                            btnClass =
+                              "border-emerald-500 bg-emerald-50 text-emerald-700 font-bold";
+                          else if (isSelected && !isCorrect)
+                            btnClass = "border-red-400 bg-red-50 text-red-600";
+                          else
+                            btnClass =
+                              "border-slate-200 bg-slate-50 opacity-50";
+                        } else if (isSelected) {
+                          btnClass =
+                            "border-indigo-600 bg-indigo-50 text-indigo-700 font-bold";
+                        }
+
+                        return (
+                          <button
+                            key={cIndex}
+                            onClick={() => {
+                              if (!quizSubmitted) {
+                                setUserAnswers((prev) => ({
+                                  ...prev,
+                                  [qIndex]: choice.id,
+                                }));
+                              }
+                            }}
+                            disabled={quizSubmitted}
+                            className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm ${btnClass} ${!quizSubmitted ? "cursor-pointer active:scale-[0.99]" : ""}`}
+                          >
+                            <span className="font-bold mr-2">{choice.id}.</span>{" "}
+                            {choice.text}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {quizSubmitted && (
+                      <div
+                        className={`mt-4 p-4 text-sm rounded-xl border ${userAnswers[qIndex] === q.correct_answer ? "bg-emerald-50 border-emerald-100 text-emerald-800" : "bg-indigo-50 border-indigo-100 text-indigo-800"}`}
+                      >
+                        <span className="font-bold block mb-1">
+                          {userAnswers[qIndex] === q.correct_answer
+                            ? "✅ Jawaban Anda Benar!"
+                            : `❌ Salah! Jawaban yang benar adalah: ${q.correct_answer}`}
+                        </span>
+                        <span className="font-semibold">Penjelasan:</span>{" "}
+                        {q.explanation}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                Data kuis tidak ditemukan atau format tidak sesuai.
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3 mt-auto pt-4 border-t border-slate-100 shrink-0">
+            <button
+              onClick={() => {
+                setShowQuizModal(false);
+                setQuizSubmitted(false);
+                setUserAnswers({});
+              }}
+              className="flex-1 py-3.5 font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+            >
+              Tutup
+            </button>
+            {!quizSubmitted ? (
+              <button
+                disabled={
+                  Object.keys(userAnswers).length !==
+                  (aiResult?.data?.quiz?.length || aiResult?.quiz?.length)
+                }
+                onClick={() => setQuizSubmitted(true)}
+                className="flex-1 py-3.5 font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed rounded-xl transition-colors shadow-lg shadow-indigo-200 cursor-pointer"
+              >
+                Cek Jawaban
+              </button>
+            ) : (
+              <button
+                onClick={handleInsertToNote}
+                className="flex-1 py-3.5 font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl transition-colors shadow-lg shadow-emerald-200 cursor-pointer"
+              >
+                Simpan ke Catatan
+              </button>
+            )}
+          </div>
         </BaseModal>
       </div>
     </motion.div>
