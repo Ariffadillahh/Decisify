@@ -1,13 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
-import {
-  FiMenu,
-  FiX,
-  FiClock,
-  FiChevronDown,
-  FiLogOut,
-} from "react-icons/fi";
+import { FiMenu, FiX, FiClock, FiChevronDown, FiLogOut } from "react-icons/fi";
 import { BiTask } from "react-icons/bi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { IoArchiveOutline } from "react-icons/io5";
@@ -15,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useTasks } from "../../hooks/useTasks";
 import { useNotes } from "../../hooks/useNotes";
-import { db } from "../../services/db"; 
+import { db } from "../../services/db";
 
 import DesktopSearch from "./DesktopSearch";
 import NotificationMenu from "./NotificationMenu";
@@ -150,7 +144,10 @@ const NavbarDashboard = () => {
               className="flex items-center gap-3 group focus:outline-none cursor-pointer"
             >
               <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-black text-slate-900 leading-tight group-hover:text-[#007BFF] transition-colors">
+                <span
+                  className="text-sm font-black text-slate-900 leading-tight group-hover:text-[#007BFF] transition-colors truncate max-w-[130px]"
+                  title={user?.name || "Guest"}
+                >
                   {user?.name || "Guest"}
                 </span>
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
@@ -184,6 +181,14 @@ const NavbarDashboard = () => {
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                         Akun Saya
                       </p>
+                      <div className="block md:hidden mt-3 mb-1">
+                        <span className="block text-sm font-black text-slate-900 truncate">
+                          {user?.name || "Guest"}
+                        </span>
+                        <span className="block text-[10px] text-[#007BFF] font-bold uppercase tracking-widest mt-0.5">
+                          {user?.role || "User"}
+                        </span>
+                      </div>
                     </div>
 
                     <button

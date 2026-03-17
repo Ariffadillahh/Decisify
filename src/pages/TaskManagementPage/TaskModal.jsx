@@ -70,9 +70,14 @@ const TaskModal = ({
               placeholder="Cth: Laporan Data..."
               className="w-full p-4 bg-slate-50 border border-slate-200 hover:border-blue-200 focus:border-[#007BFF] focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-semibold text-slate-800 transition-all placeholder:font-medium placeholder:text-slate-300"
               value={formData.title || ""}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange({
+                  target: { name: "title", value: e.target.value.trimStart() },
+                });
+              }}
               required
               autoFocus
+              pattern=".*\S+.*"
               maxLength={80}
             />
           </div>
@@ -123,7 +128,15 @@ const TaskModal = ({
                     placeholder="Nama kategori baru..."
                     className="w-full p-4 pl-11 bg-slate-50 border border-slate-200 hover:border-blue-200 focus:border-[#007BFF] focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-semibold text-slate-800 transition-all pr-28"
                     value={formData.category || ""}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange({
+                        target: {
+                          name: "category",
+                          value: e.target.value.trimStart(),
+                        },
+                      });
+                    }}
+                    pattern=".*\S+.*"
                     required
                     maxLength={50}
                   />
@@ -232,7 +245,7 @@ const TaskModal = ({
                   onChange={handleChange}
                   style={{
                     MozAppearance: "textfield",
-                  }} 
+                  }}
                 />
 
                 <button

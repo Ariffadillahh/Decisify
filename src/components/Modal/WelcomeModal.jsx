@@ -8,7 +8,7 @@ import {
   FiArrowRight,
   FiX,
   FiUploadCloud,
-  FiLoader, 
+  FiLoader,
 } from "react-icons/fi";
 import { db } from "../../services/db";
 import { gooeyToast } from "goey-toast";
@@ -16,7 +16,7 @@ import { gooeyToast } from "goey-toast";
 const WelcomeModal = ({ isOpen, onSave, onClose }) => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  const [isImporting, setIsImporting] = useState(false); 
+  const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef(null);
 
   const roles = [
@@ -36,7 +36,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setIsImporting(true); 
+    setIsImporting(true);
 
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -94,12 +94,12 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
             window.location.reload();
           }, 1500);
         } else {
-          setIsImporting(false); 
+          setIsImporting(false);
           gooeyToast.success("Database pulih! Silakan lengkapi profil.");
         }
       } catch (err) {
         console.error("Import error:", err);
-        setIsImporting(false); 
+        setIsImporting(false);
         gooeyToast.error("Gagal: " + err.message);
       }
     };
@@ -115,7 +115,7 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={!isImporting ? onClose : null} 
+            onClick={!isImporting ? onClose : null}
           />
 
           <motion.div
@@ -201,16 +201,22 @@ const WelcomeModal = ({ isOpen, onSave, onClose }) => {
             <div className="px-8 pb-8">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2 ml-1">
-                    Nama Lengkap
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">
+                      Nama Lengkap
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-medium pr-1">
+                      {name.length || 0}/50
+                    </span>
+                  </div>
                   <input
                     type="text"
                     placeholder="Masukkan nama Anda..."
                     className="w-full p-4 bg-slate-50 border border-slate-200 hover:border-blue-200 focus:border-[#007BFF] focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-slate-800 transition-all placeholder:font-medium placeholder:text-slate-300"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => setName(e.target.value.trimStart())}
                     required
+                    maxLength={50}
                   />
                 </div>
 
