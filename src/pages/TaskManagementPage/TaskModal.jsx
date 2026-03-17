@@ -61,7 +61,7 @@ const TaskModal = ({
                 Nama Tugas
               </label>
               <span className="text-[10px] text-slate-400 font-medium">
-                {formData.title?.length || 0}/15
+                {formData.title?.length || 0}/80
               </span>
             </div>
             <input
@@ -73,7 +73,7 @@ const TaskModal = ({
               onChange={handleChange}
               required
               autoFocus
-              maxLength={15}
+              maxLength={80}
             />
           </div>
 
@@ -121,11 +121,11 @@ const TaskModal = ({
                     type="text"
                     name="category"
                     placeholder="Nama kategori baru..."
-                    className="w-full p-4 pl-11 bg-slate-50 border border-slate-200 hover:border-blue-200 focus:border-[#007BFF] focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-semibold text-slate-800 transition-all pr-24"
+                    className="w-full p-4 pl-11 bg-slate-50 border border-slate-200 hover:border-blue-200 focus:border-[#007BFF] focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-semibold text-slate-800 transition-all pr-28"
                     value={formData.category || ""}
                     onChange={handleChange}
                     required
-                    maxLength={20}
+                    maxLength={50}
                   />
                   {}
                   <span
@@ -133,7 +133,7 @@ const TaskModal = ({
                       categories.length > 0 ? "right-20" : "right-5"
                     }`}
                   >
-                    {formData.category?.length || 0}/20
+                    {formData.category?.length || 0}/50
                   </span>
 
                   {categories.length > 0 && (
@@ -172,34 +172,84 @@ const TaskModal = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200 hover:border-blue-200 transition-colors group">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2 flex items-center gap-1">
-                <FiActivity size={12} className="text-orange-500" /> Sulit (1-5)
-              </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200 hover:border-blue-200 transition-colors group flex flex-col justify-center">
+              <div className="flex justify-between items-center mb-3">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+                  <FiActivity size={12} className="text-orange-500" /> Sulit
+                </label>
+                <span className="font-black text-lg text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-100 shadow-sm">
+                  {formData.tingkat_kesulitan || 1}
+                </span>
+              </div>
+
               <input
-                type="number"
+                type="range"
                 name="tingkat_kesulitan"
                 min="1"
                 max="5"
-                className="w-full bg-transparent font-black text-xl text-slate-800 outline-none text-center"
+                step="1"
+                className="w-full accent-[#007BFF] cursor-pointer h-2 bg-slate-200 rounded-lg appearance-none"
                 value={formData.tingkat_kesulitan || 1}
                 onChange={handleChange}
               />
+              <div className="flex justify-between text-[9px] text-slate-400 font-bold mt-2 px-0.5">
+                <span>Mudah</span>
+                <span>Sulit</span>
+              </div>
             </div>
 
-            <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200 hover:border-blue-200 transition-colors group">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2 flex items-center gap-1">
+            <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200 hover:border-blue-200 transition-colors group flex flex-col justify-center">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-1">
                 <FiClock size={12} className="text-blue-500" /> Jam Est.
               </label>
-              <input
-                type="number"
-                name="estimasi_jam"
-                min="1"
-                className="w-full bg-transparent font-black text-xl text-slate-800 outline-none text-center"
-                value={formData.estimasi_jam || 1}
-                onChange={handleChange}
-              />
+
+              <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleChange({
+                      target: {
+                        name: "estimasi_jam",
+                        value: Math.max(
+                          1,
+                          (parseInt(formData.estimasi_jam) || 1) - 1,
+                        ),
+                      },
+                    })
+                  }
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 font-bold active:scale-95 transition-all"
+                >
+                  -
+                </button>
+
+                <input
+                  type="number"
+                  name="estimasi_jam"
+                  min="1"
+                  className="w-10 bg-transparent font-black text-xl text-slate-800 outline-none text-center appearance-none"
+                  value={formData.estimasi_jam || 1}
+                  onChange={handleChange}
+                  style={{
+                    MozAppearance: "textfield",
+                  }} 
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleChange({
+                      target: {
+                        name: "estimasi_jam",
+                        value: (parseInt(formData.estimasi_jam) || 1) + 1,
+                      },
+                    })
+                  }
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-[#007BFF] hover:bg-blue-100 font-bold active:scale-95 transition-all"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
         </form>
