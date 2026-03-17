@@ -74,25 +74,18 @@ const LandingPage = () => {
 
   return (
     <>
-      <Navbar
-        onOpenModal={() => setIsModalOpen(true)}
-        scrollToSection={scrollToSection}
-        logo={logo}
-      />
+      <Navbar onOpenModal={() => setIsModalOpen(true)} scrollToSection={scrollToSection} logo={logo} />
 
       <section id="hero" className="bg-[#F5F7F8] pt-24 pb-16">
-        <div className=" px-5 md:px-[80px]">
+        <div className="px-5 md:px-[80px]">
           <div className="grid md:grid-cols-2 items-center gap-12">
             <div>
               <h1 className="md:text-[72px] text-5xl font-black tracking-tight leading-15 md:leading-18">
-                Kuasai Waktu dengan{" "}
-                <span className="text-[#007BFF]">Presisi</span> Data.
+                Kuasai Waktu dengan <span className="text-[#007BFF]">Presisi</span> Data.
               </h1>
 
               <p className="text-[#475569] text-lg my-6 max-w-xl">
-                Sistem manajemen kognitif yang memvisualisasikan waktu Anda dan
-                memprioritaskan tugas secara cerdas. Efisiensi maksimal, tanpa
-                ketergantungan server, dengan 100% privasi lokal.
+                Sistem manajemen kognitif yang memvisualisasikan waktu Anda dan memprioritaskan tugas secara cerdas. Efisiensi maksimal, tanpa ketergantungan server, dengan 100% privasi lokal.
               </p>
 
               <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -108,15 +101,9 @@ const LandingPage = () => {
 
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-4">
-                    <div className="w-12 h-12 rounded-full border-4 border-white bg-blue-500 text-white flex items-center justify-center font-semibold">
-                      AF
-                    </div>
-                    <div className="w-12 h-12 rounded-full border-4 border-white bg-purple-500 text-white flex items-center justify-center font-semibold">
-                      FI
-                    </div>
-                    <div className="w-12 h-12 rounded-full border-4 border-white bg-green-500 text-white flex items-center justify-center font-semibold">
-                      RM
-                    </div>
+                    <div className="w-12 h-12 rounded-full border-4 border-white bg-blue-500 text-white flex items-center justify-center font-semibold">AF</div>
+                    <div className="w-12 h-12 rounded-full border-4 border-white bg-purple-500 text-white flex items-center justify-center font-semibold">FI</div>
+                    <div className="w-12 h-12 rounded-full border-4 border-white bg-green-500 text-white flex items-center justify-center font-semibold">RM</div>
                   </div>
 
                   <p className="text-sm text-gray-600 leading-snug">
@@ -128,11 +115,7 @@ const LandingPage = () => {
             </div>
 
             <div className="hidden md:flex justify-end ">
-              <img
-                src={HeroBg}
-                alt="Dashboard Produktivitas"
-                className="w-[80%]"
-              />
+              <img src={HeroBg} alt="Dashboard Produktivitas" className="w-[80%]" />
             </div>
           </div>
 
@@ -161,24 +144,15 @@ const LandingPage = () => {
       <Testimoni />
       <section className="px-5 md:px-[80px] py-20 bg-[#F5F7F8]">
         <div className="max-w-6xl mx-auto rounded-[32px] px-10 py-20 text-center relative overflow-hidden bg-gradient-to-r from-[#0B1E3B] via-[#0E2A53] to-[#0B1E3B]">
-          <div className="absolute -left-40 -top-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
-          <div className="absolute -right-40 -bottom-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px]"></div>
+          <div className="absolute -left-40 -top-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px] pointer-events-none"></div>
+          <div className="absolute -right-40 -bottom-40 w-[400px] h-[400px] bg-blue-500/20 blur-[120px] pointer-events-none"></div>
 
-          <h2 className="text-white font-black text-3xl md:text-5xl leading-tight max-w-3xl mx-auto">
-            Sederhanakan Keputusan, Fokus pada Eksekusi.
-          </h2>
+          <h2 className="text-white font-black text-3xl md:text-5xl leading-tight max-w-3xl mx-auto">Sederhanakan Keputusan, Fokus pada Eksekusi.</h2>
 
-          <p className="text-slate-300 mt-6 max-w-xl mx-auto text-sm md:text-base">
-            Ubah kebingungan menjadi keputusan yang jelas. Akses instan tanpa
-            pendaftaran, tanpa syarat, dan 100% privasi lokal. Mulai produktif
-            hari ini.
-          </p>
+          <p className="text-slate-300 mt-6 max-w-xl mx-auto text-sm md:text-base">Ubah kebingungan menjadi keputusan yang jelas. Akses instan tanpa pendaftaran, tanpa syarat, dan 100% privasi lokal. Mulai produktif hari ini.</p>
 
           <div className="flex flex-col md:flex-row justify-center gap-4 mt-10">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 transition-all shadow-lg shadow-blue-500/30"
-            >
+            <button type="button" onClick={() => setIsModalOpen(true)} className="px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 transition-all shadow-lg shadow-blue-500/30">
               Mulai Atur Tugas
             </button>
           </div>
@@ -186,11 +160,7 @@ const LandingPage = () => {
       </section>
       <Footer logo={logo} scrollToSection={scrollToSection} />
 
-      <WelcomeModal
-        isOpen={isModalOpen}
-        onSave={handleSaveUserData}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <WelcomeModal isOpen={isModalOpen} onSave={handleSaveUserData} onClose={() => setIsModalOpen(false)} />
     </>
   );
 };
