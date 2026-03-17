@@ -84,7 +84,7 @@ const LandingPage = () => {
         <div className=" px-5 md:px-[80px]">
           <div className="grid md:grid-cols-2 items-center gap-12">
             <div>
-              <h1 className="md:text-[72px] text-5xl font-black tracking-tight leading-18">
+              <h1 className="md:text-[72px] text-5xl font-black tracking-tight leading-15 md:leading-18">
                 Kuasai Waktu dengan{" "}
                 <span className="text-[#007BFF]">Presisi</span> Data.
               </h1>
