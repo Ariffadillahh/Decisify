@@ -1,104 +1,370 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { BiNote, BiTimeFive, BiChevronRight } from "react-icons/bi";
+import React, { useMemo } from "react";
+import { motion } from "framer-motion";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartTooltip } from "recharts";
+import { Zap, Clock, FileText, CheckCircle2, AlertCircle, ArrowRight, Flame, BarChart3, Star, TrendingUp, ChevronRight, Plus, FolderOpen } from "lucide-react";
 import MainLayouts from "../MainLayouts";
+import { formatDistanceToNow } from "date-fns";
+import { id } from "date-fns/locale";
+import { useTasks } from "../../hooks/useTasks";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { db } from "../../services/db";
+import { useLiveQuery } from "dexie-react-hooks";
 import { useNotes } from "../../hooks/useNotes";
 
-const RecentNotesWidget = () => {
-  const { recentNotes, setActiveNote } = useNotes();
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="p-5 border-b border-gray-50 flex items-center justify-between">
-        <h3 className="font-bold text-gray-800 flex items-center gap-2">
-          <BiTimeFive className="text-indigo-500" />
-          Baru-baru Ini Diakses
-        </h3>
-        <Link
-          to="/notes"
-          className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
-        >
-          Lihat Semua <BiChevronRight />
-        </Link>
-      </div>
-
-      <div className="divide-y divide-gray-50">
-        {recentNotes.length > 0 ? (
-          recentNotes.map((note) => (
-            <Link
-              key={note.id}
-              to={`/notes/${note.id}`}
-              onClick={() => setActiveNote(note)}
-              className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors group"
-            >
-              <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0 group-hover:bg-indigo-100 transition-colors">
-                <BiNote size={20} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-bold text-gray-700 truncate group-hover:text-indigo-600 transition-colors">
-                  {note.title || "Untitled Note"}
-                </h4>
-                <p className="text-[11px] text-gray-400 mt-0.5">
-                  Diperbarui{" "}
-                  {new Date(note.updatedAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "short",
-                  })}
-                </p>
-              </div>
-            </Link>
-          ))
-        ) : (
-          <div className="p-10 text-center">
-            <p className="text-sm text-gray-400">Belum ada catatan terbaru</p>
-          </div>
-        )}
-      </div>
+const StatCard = ({ icon, label, value, desc, color }) => (
+  <div className="bg-white p-4 md:p-5 rounded-[2rem] border border-slate-100 flex items-center gap-4 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 group">
+    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-lg md:text-xl shrink-0 ${color}`}>{icon}</div>
+    <div className="min-w-0">
+      <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{label}</p>
+      <p className="text-base md:text-lg font-black text-slate-800 leading-tight">{value}</p>
+      <p className="text-[9px] md:text-[10px] text-slate-400 font-medium mt-0.5 truncate">{desc}</p>
     </div>
-  );
-};
+  </div>
+);
 
 const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const firstName = user?.name ? user.name.split(" ")[0] : "Mahasiswa";
+  const { tasks, allRawTasks } = useTasks();
+  const navigate = useNavigate();
+
+  const topTask = useMemo(() => {
+    return tasks.find((t) => t.status !== "Done") || null;
+  }, [tasks]);
+
+  const sessions = useLiveQuery(() => db.focus_sessions.toArray()) || [];
+
+  const statsData = useMemo(() => {
+    // 1. Total Jam Fokus (dari detik ke jam)
+    const totalSeconds = sessions.reduce((acc, s) => acc + s.duration_seconds, 0);
+    const totalHours = (totalSeconds / 3600).toFixed(1);
+
+    // 2. Hitung Streak
+    const uniqueDates = [...new Set(sessions.map((s) => s.date))].sort().reverse();
+    let streak = 0;
+    const today = new Date().toLocaleDateString("id-ID");
+    if (uniqueDates.includes(today)) streak = uniqueDates.length; // Logika sederhana streak
+
+    // 3. Tugas Selesai (MENGGUNAKAN allRawTasks UNTUK MENCAKUP ARCHIVE)
+    // Kita filter semua tugas yang statusnya "Done", baik yang sudah diarsip maupun belum
+    const completedTasksCount = allRawTasks.filter((t) => t.status === "Done").length;
+
+    // 4. Efisiensi (Berdasarkan tugas yang aktif saat ini di Kanban)
+    const activeTasks = tasks.length;
+    const activeDone = tasks.filter((t) => t.status === "Done").length;
+    const efficiency = activeTasks > 0 ? Math.round((activeDone / activeTasks) * 100) : 0;
+
+    return { totalHours, streak, completedTasksCount, efficiency };
+  }, [sessions, allRawTasks, tasks]);
+
+  const priorityQueue = useMemo(() => {
+    return tasks.filter((task) => !task.done).slice(0, 5); // Tampilkan 5 teratas agar UI tetap padat
+  }, [tasks]);
+
+  // 1. Logic Agregasi Data Kategori
+  const categoryStats = useMemo(() => {
+    const counts = {};
+
+    // Hitung kemunculan tiap kategori
+    allRawTasks.forEach((task) => {
+      const catName = task.categoryName || "Umum";
+      counts[catName] = (counts[catName] || 0) + 1;
+    });
+
+    // Warna Palette Modern
+    const COLORS = ["#2563eb", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#64748b"];
+
+    // Ubah ke format yang diterima Recharts
+    return Object.keys(counts).map((name, index) => ({
+      name,
+      value: counts[name],
+      color: COLORS[index % COLORS.length],
+    }));
+  }, [allRawTasks]);
+
+  const totalTasks = allRawTasks.length;
+
+  // 1. Ambil data dari hook useNotes
+  const { recentNotes, folders, setActiveNote } = useNotes();
+
+  const displayedNotes = useMemo(() => {
+    return recentNotes.slice(0, 3);
+  }, [recentNotes]);
+
+  // 2. Helper untuk mengambil Folder Name
+  const getFolderName = (folderId) => {
+    if (!folderId) return "Uncategorized";
+    const folder = folders.find((f) => f.id === folderId);
+    return folder ? folder.name : "Uncategorized";
+  };
+
+  // 3. Helper untuk Ekstrak Preview (Parsing BlockNote JSON)
+  const getNotePreview = (contentString) => {
+    try {
+      const content = JSON.parse(contentString);
+      // Cari blok paragraf pertama yang punya teks
+      const firstTextGroup = content.find((block) => block.type === "paragraph" && block.content && block.content.length > 0);
+
+      if (firstTextGroup) {
+        return firstTextGroup.content.map((c) => c.text).join("");
+      }
+      return "Tidak ada preview teks...";
+    } catch (e) {
+      return "Gagal memuat preview...";
+    }
+  };
 
   return (
     <MainLayouts>
-      <div className="max-w-7xl mx-auto p-4 md:p-10 space-y-8 ">
-        <header>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-            Selamat Belajar, {firstName}! 🚀
-          </h1>
-          <p className="text-gray-500 mt-1 italic text-sm">
-            "Inovasi mahasiswa untuk produktivitas tanpa batas."
-          </p>
-        </header>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 md:gap-8 pb-10 py-2 px-2 md:px-0">
+        {/* 1. HERO SECTION (Responsive Padding & Text) */}
+        <section className="relative overflow-hidden bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-12 text-white shadow-2xl">
+          {/* Dekorasi Latar Belakang */}
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px]" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-[#007BFF] rounded-3xl p-8 text-white shadow-xl shadow-blue-100">
-              <h2 className="text-xl font-bold mb-2">
-                Siap Produktif Hari Ini?
-              </h2>
-              <p className="text-blue-100 text-sm mb-6">
-                Atur prioritas dan pantau semua progres tugasmu melalui Kanban
-                Board.
-              </p>
+          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 mb-6">
+                <Zap size={14} className="fill-blue-400" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Keputusan Cerdas</span>
+              </div>
 
+              {topTask ? (
+                <>
+                  <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-6">
+                    {user?.name || "Guest"}, fokus ke <br />
+                    <span className="text-blue-400">"{topTask.title}"</span> dulu ya.
+                  </h1>
+
+                  <div className="flex flex-wrap items-center gap-6 text-slate-400 font-bold">
+                    <div className="flex items-center gap-2">
+                      <Star size={18} className="text-amber-400 fill-amber-400" />
+                      <span className="text-sm md:text-base text-white">Skor Urgensi: {(topTask.finalScore * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock size={18} />
+                      <span className="text-sm md:text-base">Estimasi {topTask.estimasi_jam} Jam</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <AlertCircle size={18} />
+                      <span className="text-sm md:text-base truncate max-w-[150px]">{topTask.categoryName || "Umum"}</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-6">
+                  Luar biasa! <br />
+                  <span className="text-green-400">Semua tugas beres.</span>
+                </h1>
+              )}
+            </div>
+
+            {topTask && (
               <Link
-                to={`/tasks`}
-                className="inline-block bg-white text-[#007BFF] px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-blue-50 transition-all"
+                to={"/tasks"}
+                className="w-full lg:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-blue-600/20 cursor-pointer"
               >
-                Buka Daftar Tugas
+                Mulai Sesi Fokus <ArrowRight size={20} />
+              </Link>
+            )}
+          </div>
+        </section>
+
+        {/* 2. STATS GRID (Adaptive Columns) */}
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <StatCard icon={<Flame />} label="Focus Streak" value={`${statsData.streak} Hari`} desc="Konsistensi harian" color="bg-orange-50 text-orange-500" />
+          <StatCard icon={<CheckCircle2 />} label="Tugas Selesai" value={statsData.completedTasksCount} desc="Termasuk di Arsip" color="bg-green-50 text-green-500" />
+          <StatCard icon={<TrendingUp />} label="Efficiency" value={`${statsData.efficiency}%`} desc="Rasio Kanban aktif" color="bg-blue-50 text-blue-500" />
+          <StatCard icon={<Clock />} label="Waktu Fokus" value={`${statsData.totalHours}j`} desc="Total jam belajar" color="bg-purple-50 text-purple-500" />
+        </section>
+
+        {/* 3. MAIN CONTENT (Stack on Mobile, Side-by-Side on Desktop) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          {/* Beban Kategori (Hidden on very small screens or placed at bottom) */}
+          <section className="lg:col-span-4 bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm flex flex-col h-full">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
+                <BarChart3 size={20} className="text-slate-400" /> Beban Kategori
+              </h3>
+            </div>
+
+            {totalTasks > 0 ? (
+              <>
+                {/* Chart Area */}
+                <div className="h-64 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={categoryStats} innerRadius="70%" outerRadius="90%" paddingAngle={8} dataKey="value" animationDuration={1000}>
+                        {categoryStats.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                        ))}
+                      </Pie>
+                      <RechartTooltip contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  {/* Total Center Label */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-4xl font-black text-slate-800">{totalTasks}</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Tugas</span>
+                  </div>
+                </div>
+
+                {/* Legend Area (Custom Legend untuk Dense UI) */}
+                <div className="mt-8 flex flex-col gap-3 overflow-y-auto max-h-48 pr-2 custom-scrollbar">
+                  {categoryStats.map((cat, i) => (
+                    <div key={i} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition-colors group">
+                      <div className="flex items-center gap-3 truncate">
+                        <div className="w-3 h-3 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: cat.color }} />
+                        <span className="text-xs font-bold text-slate-600 truncate group-hover:text-slate-900">{cat.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-slate-800">{cat.value}</span>
+                        <span className="text-[10px] font-medium text-slate-300">({((cat.value / totalTasks) * 100).toFixed(0)}%)</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 italic text-sm text-center px-4">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                  <BarChart3 size={24} className="opacity-20" />
+                </div>
+                Belum ada data kategori untuk dianalisis.
+              </div>
+            )}
+          </section>
+
+          {/* Antrian Prioritas */}
+          <section className="lg:col-span-8 bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
+                  <Zap size={20} className="text-blue-500 fill-blue-500" /> Antrian Prioritas
+                </h3>
+                <p className="text-xs text-slate-400 font-medium mt-1">Disusun otomatis berdasarkan urgensi & deadline</p>
+              </div>
+              <Link to={"/tasks"} className="text-[10px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-4 py-2 rounded-xl hover:bg-blue-100 transition-colors cursor-pointer">
+                Lihat Semua
               </Link>
             </div>
+
+            <div className="flex flex-col gap-4">
+              {priorityQueue.length > 0 ? (
+                priorityQueue.map((task, index) => (
+                  <motion.div
+                    key={task.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group flex items-center gap-4 p-4 rounded-3xl bg-slate-50/50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-md transition-all cursor-pointer"
+                  >
+                    {/* Score Badge */}
+                    <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex flex-col items-center justify-center shrink-0 shadow-sm group-hover:border-blue-200 transition-colors">
+                      <span className="text-sm font-black text-blue-600">{(task.finalScore * 100).toFixed(0)}</span>
+                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter text-center">Urgensi</span>
+                    </div>
+
+                    {/* Task Info */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-slate-800 truncate group-hover:text-blue-600 transition-colors">{task.title}</h4>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight bg-slate-100 px-2 py-0.5 rounded">{task.categoryName || "Tanpa Kategori"}</span>
+                        <span className="flex items-center gap-1 text-[10px] text-slate-400 font-bold">
+                          <Clock size={12} /> {task.estimasi_jam} Jam
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Status & Action */}
+                    <div className="hidden sm:flex items-center gap-4">
+                      <span
+                        className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                          task.status === "Doing" ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "bg-white text-slate-400 border border-slate-200"
+                        }`}
+                      >
+                        {task.status}
+                      </span>
+                      {/* <div className="p-2 rounded-xl text-slate-300 group-hover:text-blue-500 group-hover:bg-blue-50 transition-all">
+                        <ChevronRight size={20} />
+                      </div> */}
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="py-12 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 rounded-[2rem]">
+                  <Zap size={40} className="mb-3 opacity-20" />
+                  <p className="text-sm font-medium">Belum ada tugas di antrean.</p>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* 4. NOTES SECTION (Adaptive Grid) */}
+        <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h3 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
+                <FileText size={20} className="text-indigo-500" /> Insight Catatan Terakhir
+              </h3>
+              <p className="text-xs text-slate-400 font-medium mt-1">Lanjutkan riset dan pembelajaranmu</p>
+            </div>
+            <Link to={"/notes"} className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-colors">
+              Lihat Semua
+            </Link>
           </div>
 
-          <div className="space-y-8">
-            <RecentNotesWidget />
-          </div>
-        </div>
-      </div>
+          {displayedNotes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedNotes.map((note, index) => (
+                <motion.div
+                  key={note.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => {
+                    navigate(`/notes/${note.id}`);
+                    setActiveNote(note.id);
+                  }}
+                  className="group p-6 rounded-[2rem] bg-slate-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 transition-all cursor-pointer flex flex-col h-full"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-indigo-500 shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <FileText size={20} />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-slate-800 text-sm truncate leading-tight group-hover:text-indigo-600 transition-colors">{note.title}</h4>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <FolderOpen size={10} className="text-slate-400" />
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{getFolderName(note.folderId)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preview Content (Dense Info) */}
+                  <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-3 font-medium italic opacity-80 mb-6 flex-1">"{getNotePreview(note.content)}"</p>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <span className="text-[9px] font-bold text-slate-300">
+                      {/* Menggunakan date-fns untuk relative time yang manis */}
+                      Diperbarui {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true, locale: id })}
+                    </span>
+                    <ChevronRight size={14} className="text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-slate-300 border-2 border-dashed border-slate-50 rounded-[2rem]">
+              <FileText size={48} className="mb-4 opacity-10" />
+              <p className="text-sm font-medium">Belum ada catatan. Mulai tulis ide pertamamu!</p>
+            </div>
+          )}
+        </section>
+      </motion.div>
     </MainLayouts>
   );
 };
