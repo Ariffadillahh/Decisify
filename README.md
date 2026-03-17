@@ -9,6 +9,13 @@
 
 ---
 
+## 👥 Informasi Proyek & Tim
+- **Nama Website** = Decisify
+- **Nama Tim** = WYNNN
+- **Dengan Backend** = Iya (Sebagai Jembatan antara API AI dengan Frontend)
+
+---
+
 ## 💡 Filosofi
 Nama **Decisify** diambil dari gabungan kata **Decision** dan **Simplify**. 
 Banyak orang terjebak dalam tumpukan tugas tanpa tahu harus mulai dari mana. Makna dari Decisify adalah **menyederhanakan proses pengambilan keputusan**, mengubah kekacauan menjadi daftar tindakan yang logis dan terstruktur.
@@ -37,7 +44,6 @@ Decisify bekerja dengan alur kerja yang sangat sederhana namun efektif:
    
 2. **Prioritas Otomatis** ⚙️  
    Sistem akan memproses data tersebut dan menyusun daftar tugas yang harus dikerjakan terlebih dahulu menggunakan logika cerdas.
-
 
 3. **Fokus & Selesaikan** ✅  
    Ikuti urutan prioritas yang diberikan. Gunakan fitur catatan untuk detail tugas, serta manfaatkan **rangkuman otomatis** dan **quiz interaktif** untuk memperkuat pemahaman materi (terutama bagi pelajar/mahasiswa).
